@@ -18,4 +18,8 @@
 *.pidb.meta
 
 # Unity3D Generated File On Crash Reports
+<<<<<<< HEAD
 sysinfo.txt
+=======
+sysinfo.txt
+>>>>>>> origin/master
