@@ -13,11 +13,11 @@ public class SoundManager : MonoBehaviour {
     public float lowPitchRange = .95f;
     public float highPitchRange = 1.05f;
 
-    public static SoundManager instance = null;
+    public static SoundManager SM = null;
     // Use this for initialization
     void Awake ()
     {
-        if (instance == null) instance = this;
+        if (SM == null) SM = this;
         else Destroy(gameObject);
 
         DontDestroyOnLoad(gameObject);

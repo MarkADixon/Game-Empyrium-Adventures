@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+
+//unit is responsible for graphical representation of the character and animations on unit prefab
 public class Unit : MonoBehaviour
 {
 
@@ -18,118 +20,12 @@ public class Unit : MonoBehaviour
 
 
     public GameObject damageNumber;
-    /*UnitClass unitClass;
+ 
+    public Unit()
+    {
+       
+    }
 
-
-	// Use this for initialization
-
-    public Unit(BattleControl.UnitTypes _type, GameObject _unitPos, bool _isEnemy) {
-				this.type = _type;
-				this.isEnemy = _isEnemy;
-				unitClass = GameData.obj.gameClasses[0];
-			
-				switch (type) {
-				case BattleControl.UnitTypes.Ashigaru:
-						{
-								_obj = GameObject.Find ("Ashigaru");
-								//unitClass = GameObject.Find ("BattlemaidenClass").GetComponent<UnitClass>();
-								break;
-						}
-				case BattleControl.UnitTypes.Engineer:
-						{
-								_obj = GameObject.Find ("Engineer");
-								//unitClass = GameObject.Find ("BattlemaidenClass").GetComponent<UnitClass>();
-								break;
-						}
-				case BattleControl.UnitTypes.Gunner:
-						{
-								_obj = GameObject.Find ("Gunner");
-								//unitClass = GameObject.Find ("BattlemaidenClass").GetComponent<UnitClass>();
-								break;
-						}
-				case BattleControl.UnitTypes.Junker:
-						{
-								_obj = GameObject.Find ("Junker");
-								//unitClass = GameObject.Find ("BattlemaidenClass").GetComponent<UnitClass>();
-								break;
-						}
-				case BattleControl.UnitTypes.Knight:
-						{
-								_obj = GameObject.Find ("Knight");
-								//unitClass = GameObject.Find ("BattlemaidenClass").GetComponent<UnitClass>();
-								break;
-						}
-				case BattleControl.UnitTypes.Magi:
-						{
-								_obj = GameObject.Find ("Magi");
-								//unitClass = GameObject.Find ("BattlemaidenClass").GetComponent<UnitClass>();
-								break;
-						}
-				case BattleControl.UnitTypes.Pirate:
-						{
-								_obj = GameObject.Find ("Pirate");
-								//unitClass = GameObject.Find ("BattlemaidenClass").GetComponent<UnitClass>();
-								break;
-						}
-				case BattleControl.UnitTypes.Scout:
-						{
-								_obj = GameObject.Find ("Scout");
-								//unitClass = GameObject.Find ("BattlemaidenClass").GetComponent<UnitClass>();
-								break;
-						}
-				case BattleControl.UnitTypes.Valkyrie:
-						{
-								_obj = GameObject.Find ("Valkyrie");
-								//unitClass = GameObject.Find ("BattlemaidenClass").GetComponent<UnitClass>();
-								break;
-						}
-				case BattleControl.UnitTypes.Wark:
-						{
-								_obj = GameObject.Find ("Wark");
-								//unitClass = GameObject.Find ("BattlemaidenClass").GetComponent<UnitClass>();
-								isLarge = true;
-								break;
-						}
-				case BattleControl.UnitTypes.Witch:
-						{
-								_obj = GameObject.Find ("Witch");	 
-								//unitClass = GameObject.Find ("BattlemaidenClass").GetComponent<UnitClass>();
-								break;
-						}
-				case BattleControl.UnitTypes.None:
-						{
-								isType = false;
-								break;
-						}
-				default:
-						{
-								isType = false;
-								break;
-						}
-				}
-				//clone object and set up position, depth, rotation
-				if (isType) {
-						obj = (GameObject)GameObject.Instantiate(_obj);
-						ani = obj.GetComponents<Animator>();
-						
-						//if (isLarge)
-						//		_unitPos.transform.position += new Vector3 (0f, 1f, 0f);
-
-						obj.transform.position = _unitPos.transform.position;
-						fixedPosition = obj.transform.position;
-
-						if (isEnemy){
-								obj.transform.localScale = new Vector3(obj.transform.localScale.x*-1,
-				    				                                   obj.transform.localScale.y,
-				    		            		                       obj.transform.localScale.z);
-
-						}
-						
-
-				}	
-	
-	}
-    */
     void Start()
     {
         InvokeRepeating("TakeDamage", 2f, 2f);
@@ -176,7 +72,7 @@ public class Unit : MonoBehaviour
 	public void TakeDamage() {
 
         int _damage = RollDamage();
-        
+        fixedPosition = gameObject.GetComponent<Transform>().transform.position;
 
 
         int[] digit = new int[3];

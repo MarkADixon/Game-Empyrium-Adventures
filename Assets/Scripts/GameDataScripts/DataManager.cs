@@ -5,14 +5,24 @@ using System.Collections.Generic;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 
+//Singleton
+//Holds all game state data
+//performs save/load operations
 public class DataManager : MonoBehaviour
 {
+    public static DataManager DM = null;  //This is the singleton instance!
 
-    public static DataManager instance = null;
+    //game state data
+    public List<Character> playerArmy = new List<Character>();
+    public List<Squad> playerSquads = new List<Squad>();
+
+    public List<Character> enemyArmy = new List<Character>();
+    public List<Squad> enemySquads = new List<Squad>();
+
     // Use this for initialization
     void Awake()
     {
-        if (instance == null) instance = this;
+        if (DM == null) DM = this;
         else Destroy(gameObject);
 
         DontDestroyOnLoad(gameObject);
@@ -21,6 +31,37 @@ public class DataManager : MonoBehaviour
 
     void Start()
     {
+
+        //temproary test data
+        /*
+        Character a = new Character();
+        a.squadID = 0;
+        a.squadLocX = 0;
+        a.squadLocY = 0;
+        a.unitClass.size = Size.Medium;
+        a.isLeader = true;
+        Character b = new Character();
+        b.squadID = 100;
+        b.squadLocX = 2;
+        b.squadLocY = 2;
+        b.unitClass.size = Size.Medium;
+        b.isLeader = true;
+        Squad p = new Squad();
+        Squad q = new Squad();
+        p.CreateSquad(0,a);
+        playerSquads.Add(p);
+        q.CreateSquad(0,b);
+        enemySquads.Add(q);
+        */
+
+        Squad p = new Squad();
+        Squad q = new Squad();
+        p.CreateSquad(0, playerArmy);
+        playerSquads.Add(p);
+        q.isPlayer = false;
+        q.CreateSquad(0, enemyArmy);
+        enemySquads.Add(q);
+
 
     }
 
@@ -42,7 +83,7 @@ public class DataManager : MonoBehaviour
         //will work on everything except web deploy
         BinaryFormatter bf = new BinaryFormatter();
         FileStream file = File.Create(Application.persistentDataPath + "/savegame.dat");
-        GameData data = new GameData();
+        FileData data = new FileData();
 
         //store data here
         data.isGameDataLoaded = GameSettings.isGameDataLoaded;
@@ -59,7 +100,7 @@ public class DataManager : MonoBehaviour
             //open and load
             BinaryFormatter bf = new BinaryFormatter();
             FileStream file = File.Open(Application.persistentDataPath + "/savegame.dat", FileMode.Open);
-            GameData data = (GameData)bf.Deserialize(file);
+            FileData data = (FileData)bf.Deserialize(file);
             
             file.Close();
 
@@ -70,7 +111,7 @@ public class DataManager : MonoBehaviour
 }
 
 [Serializable]
-public class GameData
+public class FileData
 {
    public bool isGameDataLoaded;
 }
@@ -78,67 +119,4 @@ public class GameData
 #endregion
 
 
-[Serializable]
-public class UnitClass
-{
-    public enum ClassNames
-    {
-        None,
-        Ashigaru, Engineer, Gunner, Junker, Knight, Magi,
-        Pirate, Scout, Valkyrie, Wark, Witch
-    };
-}
-
-
-[Serializable]
-public class Squad
-{
-    public int squadID;
-    public Character leader;
-    public List<Character> members;
-}
-
-[Serializable]
-public class Character
-{
-    public int unitID;
-    public int squadID;
-    public Vector2 squadLocation;
-
-    //character values
-    public string name = "";
-    public UnitClass charClass;
-    public int hp;
-    public int emp;
-    public int atk;
-    public int def;
-    public int mag;
-    public int res;
-    public int spi;
-    public int agi;
-    public int lck;
-
-    public float dodge;
-    public float evade;
-    public float absorb;
-    public float block;
-
-    public Action AutoAct;
-    public Action TriggerAct;
-    public Ability Active;
-    public Ability Passive;
-
-}
-
-[Serializable]
-public class Action
-{
-    
-}
-
-[Serializable]
-public class Ability
-{
-    
-}
 

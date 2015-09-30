@@ -1,12 +1,18 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class BattleManager : MonoBehaviour {
 
     public AudioClip battleStart;
     float ellapsedTime = 0f;
 
-    public GameObject unit;
+    Vector3 playerSquadOffset = new Vector3(3f,-3.75f,0);
+    Vector3 enemySquadOffset = new Vector3(-3f,0f, 0);
+    Vector3 sizeOffset;
+
+    Squad playerSquad;
+    Squad enemySquad;
 
     public static BattleManager instance = null;
     // Use this for initialization
@@ -21,14 +27,26 @@ public class BattleManager : MonoBehaviour {
     void Start()
     {
         
-        GameObject newunit = (GameObject)Instantiate(unit, Vector3.zero, Quaternion.identity);
+    }
 
+    public void StartNewBattle(Squad _playerSquad, Squad _enemySquad)
+    {
+        playerSquad = _playerSquad;
+        enemySquad = _enemySquad;
+
+        ellapsedTime = 0f;
+
+        SoundManager.SM.PlaySfx(battleStart);
+        playerSquad.CreateBattleGroup();
+        enemySquad.CreateBattleGroup();
     }
 
     // Update is called once per frame
     void Update ()
-    {
-        if(ellapsedTime == 0f) SoundManager.instance.PlaySfx(battleStart);        
+    {       
         ellapsedTime += Time.deltaTime;
     }
+
+    
+
 }
