@@ -28,7 +28,7 @@ public class Unit : MonoBehaviour
 
     void Start()
     {
-        InvokeRepeating("TakeDamage", 2f, 2f);
+        //InvokeRepeating("TakeDamage", 2f, 2f);
     }
 
     // Update is called once per frame
@@ -69,7 +69,7 @@ public class Unit : MonoBehaviour
 		}
 	}
 
-	public void TakeDamage() {
+	public void ShowDamage() {
 
         int _damage = RollDamage();
         fixedPosition = gameObject.GetComponent<Transform>().transform.position;

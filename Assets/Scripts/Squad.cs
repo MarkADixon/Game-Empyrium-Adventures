@@ -8,7 +8,8 @@ public class Squad
 {
     public int squadID = -1;
     public Character leader;
-    public List<Character> members;
+    public List<Character> members = new List<Character>();
+    public List<Unit> memberUnit = new List<Unit>(); //graphical representation game object of members
     public bool isPlayer = true;
 
     //calculated values
@@ -34,6 +35,8 @@ public class Squad
                 formation[i, j] = -1;
             }
         }
+
+        
     }
 
     void Start()
@@ -173,17 +176,11 @@ public class Squad
             Vector3 spawnLocation = new Vector3(members[i].squadLocX * 0.75f, members[i].squadLocY * 0.75f, members[i].squadLocY);
             GameObject newUnit = (GameObject)UnityEngine.Object.Instantiate(prefabUnit, spawnLocation + playerSquadOffset + sizeOffset, Quaternion.identity);
             newUnit.transform.parent = battleGroup.transform;
+            memberUnit.Add(newUnit.GetComponent<Unit>());
         }
 
         // invert enemy squad facing
         if(!isPlayer) battleGroup.transform.localScale = new Vector3(battleGroup.transform.localScale.x * -1, battleGroup.transform.localScale.y, battleGroup.transform.localScale.z);
     }
 
-    public void BattleUpdate()  //pass update through squad to character
-    {
-        for(int i = 0; i < members.Count; i++)
-        {
-            members[i].BattleUpdate();
-        }
-    }
 }

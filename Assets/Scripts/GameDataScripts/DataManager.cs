@@ -31,38 +31,7 @@ public class DataManager : MonoBehaviour
 
     void Start()
     {
-
-        //temproary test data
-        /*
-        Character a = new Character();
-        a.squadID = 0;
-        a.squadLocX = 0;
-        a.squadLocY = 0;
-        a.unitClass.size = Size.Medium;
-        a.isLeader = true;
-        Character b = new Character();
-        b.squadID = 100;
-        b.squadLocX = 2;
-        b.squadLocY = 2;
-        b.unitClass.size = Size.Medium;
-        b.isLeader = true;
-        Squad p = new Squad();
-        Squad q = new Squad();
-        p.CreateSquad(0,a);
-        playerSquads.Add(p);
-        q.CreateSquad(0,b);
-        enemySquads.Add(q);
-        */
-
-        Squad p = new Squad();
-        Squad q = new Squad();
-        p.CreateSquad(0, playerArmy);
-        playerSquads.Add(p);
-        q.isPlayer = false;
-        q.CreateSquad(0, enemyArmy);
-        enemySquads.Add(q);
-
-
+       
     }
 
     // Update is called once per frame
@@ -87,6 +56,8 @@ public class DataManager : MonoBehaviour
 
         //store data here
         data.isGameDataLoaded = GameSettings.isGameDataLoaded;
+        data.playerArmy = playerArmy;
+        data.enemyArmy = enemyArmy;
 
         //save and close
         bf.Serialize(file, data);
@@ -106,7 +77,24 @@ public class DataManager : MonoBehaviour
 
             //restore data to other objects
             GameSettings.isGameDataLoaded = data.isGameDataLoaded;
+            playerArmy = data.playerArmy;
+            enemyArmy = data.enemyArmy;
+
+            InitializeData();
+
         }
+    }
+
+    public void InitializeData()
+    {
+        //temp initialize squads. TODO code to initialize all squads
+        Squad p = new Squad();
+        Squad q = new Squad();
+        p.CreateSquad(0, playerArmy);
+        playerSquads.Add(p);
+        q.isPlayer = false;
+        q.CreateSquad(0, enemyArmy);
+        enemySquads.Add(q);
     }
 }
 
@@ -114,6 +102,10 @@ public class DataManager : MonoBehaviour
 public class FileData
 {
    public bool isGameDataLoaded;
+    //game state data
+    public List<Character> playerArmy = new List<Character>();
+    public List<Character> enemyArmy = new List<Character>();
+    
 }
 
 #endregion

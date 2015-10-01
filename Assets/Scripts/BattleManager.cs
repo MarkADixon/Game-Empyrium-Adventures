@@ -14,6 +14,9 @@ public class BattleManager : MonoBehaviour {
     Squad playerSquad;
     Squad enemySquad;
 
+    List<Character> unitsInBattle = new List<Character>();
+
+
     public static BattleManager instance = null;
     // Use this for initialization
     void Awake()
@@ -39,14 +42,30 @@ public class BattleManager : MonoBehaviour {
         SoundManager.SM.PlaySfx(battleStart);
         playerSquad.CreateBattleGroup();
         enemySquad.CreateBattleGroup();
+
+        for(int i = 0; i < playerSquad.members.Count; i++)
+        {
+            unitsInBattle.Add( playerSquad.members[i]);
+        }
+        for(int i = 0; i < enemySquad.members.Count; i++)
+        {
+            unitsInBattle.Add(enemySquad.members[i]);
+        }
     }
 
     // Update is called once per frame
     void Update ()
     {       
         ellapsedTime += Time.deltaTime;
+        AdvanceACTGuages();
     }
 
-    
+    //speed formula: Add to act guage each combat tick
+    public void AdvanceACTGuages()
+    {
+        actGuage += (2f * Mathf.Sqrt(stats.Speed + 25f));
+    }
+
+
 
 }
