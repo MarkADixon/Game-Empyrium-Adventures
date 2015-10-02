@@ -31,6 +31,10 @@ public class BattleManager : MonoBehaviour {
     //for battle calculations
     float maxAct = 0f;
     int index = 0;
+    float damage = 0;
+    float roll = 0;
+    float toHitChance = 0;
+    bool isHit = false;
 
     //make BM a singleton
     public static BattleManager instance = null;
@@ -87,8 +91,12 @@ public class BattleManager : MonoBehaviour {
 
             DetermineTargets();
 
+            RollToHit();
 
+            if (roll < toHitChance) RollDamage();
 
+            ApplyDamage();
+            
             CalculateActOrder();
         }
 
@@ -137,7 +145,7 @@ public class BattleManager : MonoBehaviour {
             //conditions: unit hp>0, 
             if(unitsInBattle[i].sheet.stats.HitPoints > 0)
             {
-                unitsInBattle[i].sheet.actGuage += Time.deltaTime * (2f * Mathf.Sqrt(unitsInBattle[i].sheet.stats.Speed + 25f));
+                unitsInBattle[i].sheet.actGuage += Time.deltaTime * (2.5f * Mathf.Sqrt(unitsInBattle[i].sheet.stats.Speed + 25f));
             }
         }
     }
@@ -233,7 +241,39 @@ public class BattleManager : MonoBehaviour {
 
     }
 
+    //
+    void RollToHit()
+    {
+        toHitChance = GameSettings.PhyHit_baseToHitChance;
+        toHitChance = toHitChance * (1 + (GameSettings.PhyHit_AttributeWeight * (actingUnit.sheet.stats.Agility + GameSettings.PhyHit_RangeSpreadConstant) / 100f));
+        toHitChance = toHitChance * (1 + (GameSettings.PhyHit_LevelWeight * (actingUnit.sheet.level + GameSettings.PhyHit_RangeSpreadConstant) / 100f));
+        toHitChance = toHitChance * (1f / (1 + (GameSettings.PhyHit_AttributeWeight * (targetedUnits[0].sheet.stats.Agility + GameSettings.PhyHit_RangeSpreadConstant) / 100f)));
+        toHitChance = toHitChance * (1f / (1 + (GameSettings.PhyHit_LevelWeight * (targetedUnits[0].sheet.level + GameSettings.PhyHit_RangeSpreadConstant) / 100f)));
+        roll = Random.Range(0f, 1f);
+        Debug.Log("Chance to Hit : " + toHitChance.ToString() + "   Rolled : " + roll.ToString());
+    }
 
+    void RollDamage()
+    {
+        damage = GameSettings.PhyDamage_baseDamage;
+        damage = damage * (1 + (GameSettings.PhyDamage_AttributeWeight * (actingUnit.sheet.stats.Strength + GameSettings.PhyDamage_RangeSpreadConstant) / 100f));
+        damage = damage * (1 + (GameSettings.PhyDamage_LevelWeight * (actingUnit.sheet.level + GameSettings.PhyDamage_RangeSpreadConstant) / 100f));
+        roll = Random.Range(damage * 0.8f, damage * 1.2f);
+        damage = roll;
+        Debug.Log("Damage : " + damage.ToString());
+    }
+
+    void ApplyDamage()
+    {
+        targetedUnits[0].piece.ShowDamage((int)damage);
+        targetedUnits[0].sheet.stats.HitPoints -= (int)damage;
+        if (targetedUnits[0].sheet.stats.HitPoints <= 0)
+        {
+            targetedUnits[0].sheet.stats.HitPoints = 0;
+            targetedUnits[0].piece.GetComponent<SpriteRenderer>().color *= 0.2f;
+        }
+
+    }
 
     //called after any action to update the shown order
     //will figure the next 10 characters to act and store in the unitActOrder list
@@ -261,7 +301,7 @@ public class BattleManager : MonoBehaviour {
                 //conditions: unit hp>0, 
                 if(unitsInBattle[i].sheet.stats.HitPoints > 0)
                 {                    
-                    futureActGuage[i] += 0.1f * (2f * Mathf.Sqrt(unitsInBattle[i].sheet.stats.Speed + 25f));
+                    futureActGuage[i] += 0.1f * (2.5f * Mathf.Sqrt(unitsInBattle[i].sheet.stats.Speed + 25f));
                     isConditionsMet = true;
                 }
             }

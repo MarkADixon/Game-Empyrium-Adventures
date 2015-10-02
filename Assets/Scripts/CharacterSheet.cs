@@ -9,6 +9,8 @@ public class CharacterSheet
 {
     //character values
     public string characterName = "No Name";
+    public int level = 1;
+    public int experience = 0;
     public CharacterClass characterClass = CharacterClass.None;
     public Size size = Size.Medium;
     public bool isElite = false;

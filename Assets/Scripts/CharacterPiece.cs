@@ -60,10 +60,9 @@ public class CharacterPiece : MonoBehaviour
         }
     }
 
-    public void ShowDamage()
+    public void ShowDamage(int _damage)
     {
 
-        int _damage = RollDamage();
         fixedPosition = gameObject.GetComponent<Transform>().transform.position;
 
 
@@ -113,11 +112,7 @@ public class CharacterPiece : MonoBehaviour
         }
     }
 
-    public int RollDamage()
-    {
-
-        return (int)Random.Range(-100, 999);
-    }
+    
 
 
 }
