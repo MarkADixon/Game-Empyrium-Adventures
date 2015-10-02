@@ -9,15 +9,18 @@ public static class GameSettings
     public static bool isGameDataLoaded;
 
     //formula - To Hit Physical
-    public static float PhyHit_baseToHitChance = 0.5f;
-    public static float PhyHit_AttributeWeight = 4f;
-    public static float PhyHit_LevelWeight = 2f;
-    public static float PhyHit_RangeSpreadConstant = 50f; //higher extends the range
+    public static float phyHit_baseToHitChance = 0.6f;
+    public static float phyHit_AttributeWeight = 4f;
+    public static float phyHit_LevelWeight = 2f;
+    public static float phyHit_RangeSpreadConstant = 50f; //higher extends the range
 
     //formula - Damage Physical Melee
-    public static float PhyDamage_baseDamage = 5f;
-    public static float PhyDamage_AttributeWeight = 4f;
-    public static float PhyDamage_LevelWeight = 2f;
-    public static float PhyDamage_RangeSpreadConstant = 0f; //higher extends the range
+    public static float phyDamage_baseDamage = 10f;
+    public static float phyDamage_AttributeWeight = 4f;
+    public static float phyDamage_LevelWeight = 2f;
+    public static float phyDamage_RangeSpreadConstant = -10f; //higher extends the range
+    public static float phyDamage_variance = 0.25f;
+    public static float phyDamageResist_AttributeWeight = 1f; //vitality resist
+    public static float phyDamageResist_LevelWeight = 0.5f;
 
 }

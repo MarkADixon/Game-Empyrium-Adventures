@@ -29,6 +29,7 @@ public class BattleManager : MonoBehaviour {
     GameObject enemyBattleGroup;
 
     //for battle calculations
+    float unitsLeftInBattle = 10f; //experiement with scaling up speed as units die
     float maxAct = 0f;
     int index = 0;
     float damage = 0;
@@ -87,17 +88,23 @@ public class BattleManager : MonoBehaviour {
 
         if(isUnitActing)
         {
-            Debug.Log(actingUnit.sheet.characterName + " is acting");
-
+        
             DetermineTargets();
+
+            Debug.Log(actingUnit.sheet.characterName + " is attacking " +targetedUnits[0].sheet.characterName);
 
             RollToHit();
 
-            if (roll < toHitChance) RollDamage();
+            if(roll < toHitChance)
+            {
+                RollDamage();
 
-            ApplyDamage();
+
+                ApplyDamage();
+            }
             
             CalculateActOrder();
+
         }
 
     }
@@ -130,8 +137,7 @@ public class BattleManager : MonoBehaviour {
     //initial actguage values from 0 to 75 (100 to act)
     void RollInitative()
     {
-        Debug.Log("Rolling Initative");
-        for(int i = 0; i < enemySquad.members.Count; i++)
+        for(int i = 0; i < unitsInBattle.Count; i++)
         {
             unitsInBattle[i].sheet.actGuage = Random.Range(0f, 75f);
         }
@@ -140,12 +146,25 @@ public class BattleManager : MonoBehaviour {
     //speed formula: Add to act guage each combat tick
     void AdvanceACTGuages()
     {
+        unitsLeftInBattle = 0;
         for(int i = 0; i < unitsInBattle.Count; i++)
         {
             //conditions: unit hp>0, 
             if(unitsInBattle[i].sheet.stats.HitPoints > 0)
             {
-                unitsInBattle[i].sheet.actGuage += Time.deltaTime * (2.5f * Mathf.Sqrt(unitsInBattle[i].sheet.stats.Speed + 25f));
+
+                unitsLeftInBattle += 1;
+            }
+        }
+        
+
+        for(int i = 0; i < unitsInBattle.Count; i++)
+        {
+            //conditions: unit hp>0, 
+            if(unitsInBattle[i].sheet.stats.HitPoints > 0)
+            {
+                
+                unitsInBattle[i].sheet.actGuage += (10f/unitsLeftInBattle) * Time.deltaTime * (2.5f * Mathf.Sqrt(unitsInBattle[i].sheet.stats.Speed + 25f));
             }
         }
     }
@@ -244,27 +263,32 @@ public class BattleManager : MonoBehaviour {
     //
     void RollToHit()
     {
-        toHitChance = GameSettings.PhyHit_baseToHitChance;
-        toHitChance = toHitChance * (1 + (GameSettings.PhyHit_AttributeWeight * (actingUnit.sheet.stats.Agility + GameSettings.PhyHit_RangeSpreadConstant) / 100f));
-        toHitChance = toHitChance * (1 + (GameSettings.PhyHit_LevelWeight * (actingUnit.sheet.level + GameSettings.PhyHit_RangeSpreadConstant) / 100f));
-        toHitChance = toHitChance * (1f / (1 + (GameSettings.PhyHit_AttributeWeight * (targetedUnits[0].sheet.stats.Agility + GameSettings.PhyHit_RangeSpreadConstant) / 100f)));
-        toHitChance = toHitChance * (1f / (1 + (GameSettings.PhyHit_LevelWeight * (targetedUnits[0].sheet.level + GameSettings.PhyHit_RangeSpreadConstant) / 100f)));
+        toHitChance = GameSettings.phyHit_baseToHitChance;
+        toHitChance = toHitChance * (1 + (GameSettings.phyHit_AttributeWeight * (actingUnit.sheet.stats.Agility + GameSettings.phyHit_RangeSpreadConstant) / 100f));
+        toHitChance = toHitChance * (1 + (GameSettings.phyHit_LevelWeight * (actingUnit.sheet.level + GameSettings.phyHit_RangeSpreadConstant) / 100f));
+        toHitChance = toHitChance * (1f / (1 + (GameSettings.phyHit_AttributeWeight * (targetedUnits[0].sheet.stats.Agility + GameSettings.phyHit_RangeSpreadConstant) / 100f)));
+        toHitChance = toHitChance * (1f / (1 + (GameSettings.phyHit_LevelWeight * (targetedUnits[0].sheet.level + GameSettings.phyHit_RangeSpreadConstant) / 100f)));
         roll = Random.Range(0f, 1f);
         Debug.Log("Chance to Hit : " + toHitChance.ToString() + "   Rolled : " + roll.ToString());
     }
 
     void RollDamage()
     {
-        damage = GameSettings.PhyDamage_baseDamage;
-        damage = damage * (1 + (GameSettings.PhyDamage_AttributeWeight * (actingUnit.sheet.stats.Strength + GameSettings.PhyDamage_RangeSpreadConstant) / 100f));
-        damage = damage * (1 + (GameSettings.PhyDamage_LevelWeight * (actingUnit.sheet.level + GameSettings.PhyDamage_RangeSpreadConstant) / 100f));
-        roll = Random.Range(damage * 0.8f, damage * 1.2f);
+        damage = GameSettings.phyDamage_baseDamage;
+        damage = damage * (1 + (GameSettings.phyDamage_AttributeWeight * (actingUnit.sheet.stats.Strength + GameSettings.phyDamage_RangeSpreadConstant) / 100f));
+        damage = damage * (1 + (GameSettings.phyDamage_LevelWeight * (actingUnit.sheet.level + GameSettings.phyDamage_RangeSpreadConstant) / 100f));
+        roll = damage * Random.Range(1-GameSettings.phyDamage_variance, 1+ GameSettings.phyDamage_variance);
         damage = roll;
-        Debug.Log("Damage : " + damage.ToString());
+        
     }
 
     void ApplyDamage()
     {
+        //vitality reduction
+        damage = damage * (1f / (1 + (GameSettings.phyDamageResist_AttributeWeight * targetedUnits[0].sheet.stats.Vitality / 100f)));
+        damage = damage * (1f / (1 + (GameSettings.phyDamageResist_LevelWeight * targetedUnits[0].sheet.level/ 100f)));
+
+
         targetedUnits[0].piece.ShowDamage((int)damage);
         targetedUnits[0].sheet.stats.HitPoints -= (int)damage;
         if (targetedUnits[0].sheet.stats.HitPoints <= 0)
@@ -281,7 +305,7 @@ public class BattleManager : MonoBehaviour {
     void CalculateActOrder()
     {
         //initialize calculation
-        unitActOrder = new List<Character>();
+        unitActOrder.Clear();
         List<float> futureActGuage = new List<float>();
         maxAct =0;
         index=0;
@@ -297,11 +321,11 @@ public class BattleManager : MonoBehaviour {
             
             //check all units speed and advance out future act guage
             for(int i = 0; i < unitsInBattle.Count; i++)
-            {              
+            {                  
                 //conditions: unit hp>0, 
                 if(unitsInBattle[i].sheet.stats.HitPoints > 0)
-                {                    
-                    futureActGuage[i] += 0.1f * (2.5f * Mathf.Sqrt(unitsInBattle[i].sheet.stats.Speed + 25f));
+                {        
+                    futureActGuage[i] += 0.2f *(2.5f * Mathf.Sqrt(unitsInBattle[i].sheet.stats.Speed + 25f));
                     isConditionsMet = true;
                 }
             }
