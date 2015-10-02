@@ -13,11 +13,29 @@ public class DataManager : MonoBehaviour
     public static DataManager DM = null;  //This is the singleton instance!
 
     //game state data
-    public List<Character> playerArmy = new List<Character>();
-    public List<Squad> playerSquads = new List<Squad>();
+    public List<Character> playerArmy;
+    public List<CharacterSheet> playerSheets;
+    public List<Squad> playerSquads;
 
-    public List<Character> enemyArmy = new List<Character>();
-    public List<Squad> enemySquads = new List<Squad>();
+    public List<Character> enemyArmy;
+    public List<CharacterSheet> enemySheets;
+    public List<Squad> enemySquads;
+
+
+    //resources
+    GameObject prefabCharacterPiece;
+
+    //manual Initialize Call, called on awake and before load
+    void Init()
+    {
+        playerArmy = new List<Character>();
+        playerSheets = new List<CharacterSheet>();
+        playerSquads = new List<Squad>();
+
+        enemyArmy = new List<Character>();
+        enemySheets = new List<CharacterSheet>();
+        enemySquads = new List<Squad>();
+    }
 
     // Use this for initialization
     void Awake()
@@ -26,6 +44,10 @@ public class DataManager : MonoBehaviour
         else Destroy(gameObject);
 
         DontDestroyOnLoad(gameObject);
+
+        //resource initialization
+        prefabCharacterPiece = (GameObject)Resources.Load("characterPiece");
+
     }
 
 
@@ -49,6 +71,8 @@ public class DataManager : MonoBehaviour
     #region Save/Load Game
     public void Save()
     {
+        PrepareToSaveData();
+
         //will work on everything except web deploy
         BinaryFormatter bf = new BinaryFormatter();
         FileStream file = File.Create(Application.persistentDataPath + "/savegame.dat");
@@ -56,18 +80,22 @@ public class DataManager : MonoBehaviour
 
         //store data here
         data.isGameDataLoaded = GameSettings.isGameDataLoaded;
-        data.playerArmy = playerArmy;
-        data.enemyArmy = enemyArmy;
+        data.playerSheets = playerSheets;
+        data.enemySheets = enemySheets;
 
         //save and close
         bf.Serialize(file, data);
         file.Close();
+        Debug.Log("Data Saved");
+
     }
 
     public void Load()
     {
         if (File.Exists(Application.persistentDataPath + "/savegame.dat"))
         {
+            Init(); //clears data and initializes lists
+
             //open and load
             BinaryFormatter bf = new BinaryFormatter();
             FileStream file = File.Open(Application.persistentDataPath + "/savegame.dat", FileMode.Open);
@@ -77,16 +105,37 @@ public class DataManager : MonoBehaviour
 
             //restore data to other objects
             GameSettings.isGameDataLoaded = data.isGameDataLoaded;
-            playerArmy = data.playerArmy;
-            enemyArmy = data.enemyArmy;
+            playerSheets = data.playerSheets;
+            enemySheets = data.enemySheets;
 
-            InitializeData();
-
+            InitializeLoadedData();
+            Debug.Log("Data Loaded");
         }
     }
 
-    public void InitializeData()
+    public void PrepareToSaveData()
     {
+
+    }
+
+    public void InitializeLoadedData()
+    {
+        //create pieces for each sheet then add characters to player army
+        for (int i = 0; i < playerSheets.Count; i++)
+        {
+            GameObject newPiece = (GameObject)Instantiate(prefabCharacterPiece,Vector3.zero, Quaternion.identity);
+            Character newCharacter = new Character(playerSheets[i], newPiece.GetComponent<CharacterPiece>());
+            playerArmy.Add(newCharacter);
+        }
+
+        //create pieces for each enemy sheet then add characters to enemy army
+        for(int i = 0; i < enemySheets.Count; i++)
+        {
+            GameObject newPiece = (GameObject)Instantiate(prefabCharacterPiece, Vector3.zero, Quaternion.identity);
+            Character newCharacter = new Character(enemySheets[i], newPiece.GetComponent<CharacterPiece>());
+            enemyArmy.Add(newCharacter);
+        }
+
         //temp initialize squads. TODO code to initialize all squads
         Squad p = new Squad();
         Squad q = new Squad();
@@ -103,8 +152,8 @@ public class FileData
 {
    public bool isGameDataLoaded;
     //game state data
-    public List<Character> playerArmy = new List<Character>();
-    public List<Character> enemyArmy = new List<Character>();
+    public List<CharacterSheet> playerSheets = new List<CharacterSheet>();
+    public List<CharacterSheet> enemySheets = new List<CharacterSheet>();
     
 }
 
