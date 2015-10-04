@@ -160,5 +160,23 @@ public class Squad
         }      
     }
 
+    public List<Character> GetCharactersInRow(int row)
+    {
+        List<Character> charactersInRow = new List<Character>();
+
+        for(int place = 0; place < 6; place++)
+        {
+            if (formation[row,place] != -1)
+            {
+                if (!charactersInRow.Contains(members[formation[row,place]]))
+                {
+                    charactersInRow.Add(members[formation[row, place]]);
+                }
+            }
+        }
+
+        return charactersInRow;
+    }
+
 
 }

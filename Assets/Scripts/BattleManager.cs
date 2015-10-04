@@ -2,6 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 
+public enum TargetType
+{
+    Self, SingleEnemyMelee, SingleEnemyRanged
+} 
+
+
+
 public class BattleManager : MonoBehaviour {
 
     public AudioClip battleStart;
@@ -22,7 +29,7 @@ public class BattleManager : MonoBehaviour {
     bool isUnitActing = false;
     Character actingUnit;
     List<Character> targetedUnits = new List<Character>();
-    List<Character> nearestUnits = new List<Character>();
+    List<Character> selectUnits = new List<Character>();
 
     //game object containers for squad graphics objects
     GameObject playerBattleGroup;
@@ -36,6 +43,7 @@ public class BattleManager : MonoBehaviour {
     float roll = 0;
     float toHitChance = 0;
     bool isHit = false;
+    TargetType targetType = TargetType.SingleEnemyRanged;
 
     //make BM a singleton
     public static BattleManager instance = null;
@@ -224,40 +232,101 @@ public class BattleManager : MonoBehaviour {
             }
         }
 
+        switch (targetType)
+        {
+            case TargetType.SingleEnemyMelee:  //taget nearest 
+                {
+                    
+                    Target_Nearest();
+                    Target_RandomSelectOne();
+                    break;
+                }
+            case TargetType.SingleEnemyRanged: //target nearest in backmost row
+                {
+                    Target_BackRow();
+                    Target_Nearest();
+                    break;
+                }
+            default:
+                {                   
+                    break;
+                }
+        }
+    }
 
-        //case melee :  target nearest 
+    void Target_Nearest()
+    {
         float nearest = 1000;
         float distance;
-        nearestUnits.Clear();
+        selectUnits.Clear();
         //get closest
         for(int i = 0; i < targetedUnits.Count; i++)
         {
             distance = Vector2.Distance(actingUnit.piece.transform.position, targetedUnits[i].piece.transform.position);
-            if(Mathf.Approximately(distance,nearest))
+            if(Mathf.Approximately(distance, nearest))
             {
-                nearestUnits.Add(targetedUnits[i]);    
+                selectUnits.Add(targetedUnits[i]);
             }
-            else if (distance < nearest)
+            else if(distance < nearest)
             {
-                nearestUnits.Clear();
+                selectUnits.Clear();
                 nearest = distance;
-                nearestUnits.Add(targetedUnits[i]);
+                selectUnits.Add(targetedUnits[i]);
             }
         }
         //make nearest targeted
-        targetedUnits = new List<Character>(nearestUnits);
-        
+        targetedUnits = new List<Character>(selectUnits);
+    }
 
+    void Target_RandomSelectOne()
+    {
         //select one at random of remaining
-        if (targetedUnits.Count>1)
+        if(targetedUnits.Count > 1)
         {
             Character temp = targetedUnits[Random.Range(0, targetedUnits.Count)];
             targetedUnits.Clear();
             targetedUnits.Add(temp);
         }
+    }
 
-      
+    void Target_BackRow()
+    {
+        //find backmost row in opposite formation
+        int rowWithUnits = -1;
+        for(int row = 5; row >= 0; row--)
+        {
+            for (int place = 0; place<6;place++)
+            {
+                if (actingUnit.sheet.isPlayer && rowWithUnits == -1)
+                {
+                    if(enemySquad.formation[row,place] >= 0) rowWithUnits = row;
+                }
+                else if(!actingUnit.sheet.isPlayer && rowWithUnits == -1)
+                {
+                    if(playerSquad.formation[row, place] >= 0) rowWithUnits = row;
+                }
+            }
+        }
 
+        Target_SelectedRow(rowWithUnits);
+    }
+
+    void Target_SelectedRow(int row)
+    {
+        //filter for selected row
+        selectUnits.Clear();
+
+        if(actingUnit.sheet.isPlayer)
+        {
+            selectUnits = enemySquad.GetCharactersInRow(row);
+        }
+        else if(!actingUnit.sheet.isPlayer)
+        {
+            selectUnits = playerSquad.GetCharactersInRow(row);
+        }
+        
+        //make targeted
+        targetedUnits = new List<Character>(selectUnits);
     }
 
     //
