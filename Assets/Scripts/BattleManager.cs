@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public enum TargetType
 {
-    Self, SingleEnemyMelee, SingleEnemyRanged
+    Self, EnemySingleMelee, EnemySingleRanged, AllySingleLowestHP, AllySingleFallen
 } 
 
 
@@ -42,8 +42,7 @@ public class BattleManager : MonoBehaviour {
     float damage = 0;
     float roll = 0;
     float toHitChance = 0;
-    bool isHit = false;
-    TargetType targetType = TargetType.SingleEnemyRanged;
+    TargetType targetType = TargetType.Self;
 
     //make BM a singleton
     public static BattleManager instance = null;
@@ -212,38 +211,26 @@ public class BattleManager : MonoBehaviour {
 
         //reset targetunits array 
         targetedUnits = new List<Character>(unitsInBattle);
-
-        //remove allies
-        for (int i = targetedUnits.Count-1; i>=0; i--)
-        {
-            if(targetedUnits[i].sheet.isPlayer == actingUnit.sheet.isPlayer)
-            {
-                targetedUnits.RemoveAt(i);
-            }
-        }
-        
-
-        //remove fallen
-        for(int i = targetedUnits.Count-1; i >= 0; i--)
-        {
-            if(targetedUnits[i].sheet.stats.HitPoints <= 0)
-            {
-                targetedUnits.RemoveAt(i);
-            }
-        }
-
+    
         switch (targetType)
         {
-            case TargetType.SingleEnemyMelee:  //taget nearest 
+            case TargetType.Self:
                 {
-                    
-                    Target_Nearest();
+                    targetedUnits.Clear();
+                    targetedUnits.Add(actingUnit);
+                    break;
+                }
+            case TargetType.EnemySingleMelee:  //taget nearest with preference to same horizontal
+                {
+                    Target_RemoveAllies();
+                    Target_RemoveFallen();
+                    Target_NearestWithLinePreference();
                     Target_RandomSelectOne();
                     break;
                 }
-            case TargetType.SingleEnemyRanged: //target nearest in backmost row
+            case TargetType.EnemySingleRanged: //target nearest in backmost row
                 {
-                    Target_BackRow();
+                    Target_BackRow(); //no need to remove allies/fallen as it polls squad directly
                     Target_Nearest();
                     break;
                 }
@@ -252,6 +239,35 @@ public class BattleManager : MonoBehaviour {
                     break;
                 }
         }
+    }
+
+    void Target_NearestWithLinePreference()
+    {
+        float nearest = 1000;
+        float distance;
+        float dist_x;
+        float dist_y;
+        selectUnits.Clear();
+        //get closest
+        for(int i = 0; i < targetedUnits.Count; i++)
+        {
+            dist_x = (actingUnit.piece.transform.position.x - targetedUnits[i].piece.transform.position.x);
+            dist_y = (actingUnit.piece.transform.position.y - targetedUnits[i].piece.transform.position.y)*6f; //the times six makes the line preference
+
+            distance = Mathf.Sqrt(Mathf.Pow(dist_x,2f)+Mathf.Pow(dist_y,2f));
+            if(Mathf.Approximately(distance, nearest))
+            {
+                selectUnits.Add(targetedUnits[i]);
+            }
+            else if(distance < nearest)
+            {
+                selectUnits.Clear();
+                nearest = distance;
+                selectUnits.Add(targetedUnits[i]);
+            }
+        }
+        //make nearest targeted
+        targetedUnits = new List<Character>(selectUnits);
     }
 
     void Target_Nearest()
@@ -327,6 +343,30 @@ public class BattleManager : MonoBehaviour {
         
         //make targeted
         targetedUnits = new List<Character>(selectUnits);
+    }
+
+    void Target_RemoveAllies()
+    {
+        //remove allies
+        for(int i = targetedUnits.Count - 1; i >= 0; i--)
+        {
+            if(targetedUnits[i].sheet.isPlayer == actingUnit.sheet.isPlayer)
+            {
+                targetedUnits.RemoveAt(i);
+            }
+        }
+    }
+
+    void Target_RemoveFallen()
+    {
+        //remove fallen
+        for(int i = targetedUnits.Count - 1; i >= 0; i--)
+        {
+            if(targetedUnits[i].sheet.stats.HitPoints <= 0)
+            {
+                targetedUnits.RemoveAt(i);
+            }
+        }
     }
 
     //

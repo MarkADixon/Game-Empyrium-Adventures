@@ -178,5 +178,23 @@ public class Squad
         return charactersInRow;
     }
 
+    public List<Character> GetCharactersInHorizontal(int horizontal)
+    {
+        List<Character> charactersInHorizontal = new List<Character>();
+
+        for(int row = 0; row < 6; row++)
+        {
+            if(formation[row, horizontal] != -1)
+            {
+                if(!charactersInHorizontal.Contains(members[formation[row, horizontal]]))
+                {
+                    charactersInHorizontal.Add(members[formation[row, horizontal]]);
+                }
+            }
+        }
+
+        return charactersInHorizontal;
+    }
+
 
 }
