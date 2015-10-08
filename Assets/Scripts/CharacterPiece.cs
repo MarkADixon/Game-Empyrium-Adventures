@@ -13,32 +13,33 @@ public class CharacterPiece : MonoBehaviour
     //Animator[] ani;
     float timer = 0;
 
-
     public GameObject damageNumber;
+
+    Animator anim;
 
     void Start()
     {
-        //InvokeRepeating("ShowDamage", 2f, 2f);
+        anim = GetComponent<Animator>();
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        /*
         if(isAttackStart)
         {
-            if(!isAttackFinish)
+            //if(!isAttackFinish)
+            // {
+            
+            //    isAttackFinish = true;
+            //}
+            gameObject.transform.position += new Vector3(0.04f, 0f, 0f);
+            if((gameObject.transform.position - fixedPosition).magnitude > 0.66f)
             {
-                //ani[0].SetTrigger("Hit");
+                isAttackStart = false;
                 isAttackFinish = true;
             }
-            //			if (isEnemy)obj.transform.position += new Vector3(0.04f,0f,0f);
-            //				else obj.transform.position += new Vector3(-0.04f,0f,0f);
-            //		    if ((obj.transform.position - fixedPosition).magnitude >0.66f)
-            //			{
-            //				isAttackStart = false;
-            //				isAttackFinish = true;
-            //			}
 
         }
         if(isAttackFinish)
@@ -50,16 +51,23 @@ public class CharacterPiece : MonoBehaviour
                 isAttackStart = false;
                 timer = 0f;
             }
-            //			if (isEnemy) obj.transform.position += new Vector3(-0.04f,0f,0f);
-            //				else obj.transform.position += new Vector3(0.04f,0f,0f);
-            //			if ((obj.transform.position - fixedPosition).magnitude <= 0.03f)
-            //			{
-            //				obj.transform.position = fixedPosition;
-            //				isAttackFinish = false;
-            //			}
+            else
+            {
+                gameObject.transform.position += new Vector3(-0.04f, 0f, 0f);
+                if((gameObject.transform.position - fixedPosition).magnitude <= 0.03f)
+                {
+                    gameObject.transform.position = fixedPosition;
+                    isAttackFinish = false;
+                }
+            }
         }
+        */
     }
+    public void Animate_Attack()
+    {
+        anim.Play("characterPieceAttack");
 
+    }
     public void ShowDamage(int _damage)
     {
 

@@ -4,7 +4,9 @@ using System.Collections.Generic;
 
 public enum TargetType
 {
-    Self, EnemySingleMelee, EnemySingleRanged, AllySingleLowestHP, AllySingleFallen
+    Self,
+    EnemySingleLowestHP, EnemySingleHighestHP, EnemySingleMelee, EnemySingleRanged, EnemySingleRandom,
+    AllySingleLowestHP, AllySingleHighestHP, AllySingleFallen, AllySingleRandom
 } 
 
 
@@ -42,7 +44,7 @@ public class BattleManager : MonoBehaviour {
     float damage = 0;
     float roll = 0;
     float toHitChance = 0;
-    TargetType targetType = TargetType.Self;
+    TargetType targetType = TargetType.EnemySingleHighestHP;
 
     //make BM a singleton
     public static BattleManager instance = null;
@@ -95,6 +97,7 @@ public class BattleManager : MonoBehaviour {
 
         if(isUnitActing)
         {
+            
         
             DetermineTargets();
 
@@ -199,6 +202,7 @@ public class BattleManager : MonoBehaviour {
             isUnitActing = true;
             actingUnit = unitsInBattle[index];
             unitsInBattle[index].sheet.actGuage -= 100;
+            unitsInBattle[index].piece.Animate_Attack();
         }
     }
 
@@ -234,6 +238,59 @@ public class BattleManager : MonoBehaviour {
                     Target_Nearest();
                     break;
                 }
+            case TargetType.EnemySingleRandom:
+                {
+                    Target_RemoveAllies();
+                    Target_RemoveFallen();
+                    Target_RandomSelectOne();
+                    break;
+                }
+            case TargetType.EnemySingleLowestHP:
+                {
+                    Target_RemoveAllies();
+                    Target_RemoveFallen();
+                    Target_LowestHP();
+                    Target_RandomSelectOne();
+                    break;
+                }
+            case TargetType.EnemySingleHighestHP:
+                {
+                    Target_RemoveAllies();
+                    Target_RemoveFallen();
+                    Target_HighestHP();
+                    Target_RandomSelectOne();
+                    break;
+                }
+            case TargetType.AllySingleFallen:
+                {
+                    Target_RemoveEnemies();
+                    Target_RemoveUnfallen();
+                    Target_RandomSelectOne();
+                    break;
+                }
+            case TargetType.AllySingleLowestHP:
+                {
+                    Target_RemoveEnemies();
+                    Target_RemoveFallen();
+                    Target_LowestHP();
+                    Target_RandomSelectOne();
+                    break;
+                }
+            case TargetType.AllySingleHighestHP:
+                {
+                    Target_RemoveEnemies();
+                    Target_RemoveFallen();
+                    Target_HighestHP();
+                    Target_RandomSelectOne();
+                    break;
+                }
+            case TargetType.AllySingleRandom:
+                {
+                    Target_RemoveEnemies();
+                    Target_RemoveFallen();
+                    Target_RandomSelectOne();
+                    break;
+                }
             default:
                 {                   
                     break;
@@ -243,7 +300,7 @@ public class BattleManager : MonoBehaviour {
 
     void Target_NearestWithLinePreference()
     {
-        float nearest = 1000;
+        float nearest = float.MaxValue;
         float distance;
         float dist_x;
         float dist_y;
@@ -272,7 +329,7 @@ public class BattleManager : MonoBehaviour {
 
     void Target_Nearest()
     {
-        float nearest = 1000;
+        float nearest = float.MaxValue;
         float distance;
         selectUnits.Clear();
         //get closest
@@ -357,6 +414,18 @@ public class BattleManager : MonoBehaviour {
         }
     }
 
+    void Target_RemoveEnemies()
+    {
+        //remove enemies
+        for(int i = targetedUnits.Count - 1; i >= 0; i--)
+        {
+            if(targetedUnits[i].sheet.isPlayer != actingUnit.sheet.isPlayer)
+            {
+                targetedUnits.RemoveAt(i);
+            }
+        }
+    }
+
     void Target_RemoveFallen()
     {
         //remove fallen
@@ -367,6 +436,63 @@ public class BattleManager : MonoBehaviour {
                 targetedUnits.RemoveAt(i);
             }
         }
+    }
+
+    void Target_RemoveUnfallen()
+    {
+        //remove unfallen
+        for(int i = targetedUnits.Count - 1; i >= 0; i--)
+        {
+            if(targetedUnits[i].sheet.stats.HitPoints > 0)
+            {
+                targetedUnits.RemoveAt(i);
+            }
+        }
+    }
+
+    void Target_LowestHP()
+    {
+        int lowest = int.MaxValue;
+        selectUnits.Clear();
+        //get closest
+        for(int i = 0; i < targetedUnits.Count; i++)
+        {   
+            if(targetedUnits[i].sheet.stats.HitPoints == lowest)
+            {
+                selectUnits.Add(targetedUnits[i]);
+            }
+            else if(targetedUnits[i].sheet.stats.HitPoints < lowest)
+            {
+                selectUnits.Clear();
+                lowest = targetedUnits[i].sheet.stats.HitPoints;
+                selectUnits.Add(targetedUnits[i]);
+            }
+        }
+        //make lowest HP targeted
+        targetedUnits = new List<Character>(selectUnits);
+
+    }
+
+    void Target_HighestHP()
+    {
+        int highest = 0;
+        selectUnits.Clear();
+        //get closest
+        for(int i = 0; i < targetedUnits.Count; i++)
+        {
+            if(targetedUnits[i].sheet.stats.HitPoints == highest)
+            {
+                selectUnits.Add(targetedUnits[i]);
+            }
+            else if(targetedUnits[i].sheet.stats.HitPoints > highest)
+            {
+                selectUnits.Clear();
+                highest = targetedUnits[i].sheet.stats.HitPoints;
+                selectUnits.Add(targetedUnits[i]);
+            }
+        }
+        //make highest HP targeted
+        targetedUnits = new List<Character>(selectUnits);
     }
 
     //
