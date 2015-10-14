@@ -10,9 +10,6 @@ public class CharacterPiece : MonoBehaviour
     Vector3 fixedPosition = new Vector3(0f, 0f, 0f);
     public int init = 0;
 
-    //Animator[] ani;
-    float timer = 0;
-
     public GameObject damageNumber;
 
     Animator anim;
@@ -67,6 +64,10 @@ public class CharacterPiece : MonoBehaviour
     {
         anim.Play("characterPieceAttack");
 
+    }
+    public void Animate_Idle()
+    {
+        anim.Play("characterPiece_Idle");
     }
     public void ShowDamage(int _damage)
     {

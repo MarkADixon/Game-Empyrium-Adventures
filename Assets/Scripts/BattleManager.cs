@@ -2,14 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public enum TargetType
-{
-    Self,
-    EnemySingleLowestHP, EnemySingleHighestHP, EnemySingleMelee, EnemySingleRanged, EnemySingleRandom,
-    AllySingleLowestHP, AllySingleHighestHP, AllySingleFallen, AllySingleRandom
-} 
-
-
 
 public class BattleManager : MonoBehaviour {
 
@@ -495,7 +487,7 @@ public class BattleManager : MonoBehaviour {
         targetedUnits = new List<Character>(selectUnits);
     }
 
-    //
+   
     void RollToHit()
     {
         toHitChance = GameSettings.phyHit_baseToHitChance;
