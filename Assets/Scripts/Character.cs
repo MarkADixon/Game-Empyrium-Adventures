@@ -11,5 +11,10 @@ public class Character
         sheet = _sheet;
         piece = _piece;
 	}
+
+    
+
+
+
 	
 }

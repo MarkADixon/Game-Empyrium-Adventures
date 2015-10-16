@@ -126,9 +126,9 @@ public class Squad
 
         for (int i = 0; i < members.Count; i++)
         {
-            movement += members[i].sheet.stats.Movement;
-            moralle += members[i].sheet.stats.Moralle;
-            alignment += members[i].sheet.stats.Alignment;
+            movement += members[i].sheet.stats.move;
+            moralle += members[i].sheet.stats.moralePoints;
+            alignment += members[i].sheet.stats.alignment;
         }
 
         movement = movement / members.Count;

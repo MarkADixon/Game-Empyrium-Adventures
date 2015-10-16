@@ -33,10 +33,9 @@ public class BattleManager : MonoBehaviour {
     float unitsLeftInBattle = 10f; //experiement with scaling up speed as units die
     float maxAct = 0f;
     int index = 0;
-    float damage = 0;
     float roll = 0;
-    float toHitChance = 0;
-    TargetType targetType = TargetType.EnemySingleHighestHP;
+    float toHitChance, damage;
+
 
     //make BM a singleton
     public static BattleManager instance = null;
@@ -83,29 +82,46 @@ public class BattleManager : MonoBehaviour {
     {            
         ellapsedTime += Time.deltaTime;
  
-        AdvanceACTGuages();
+        //AdvanceACTGuagesRealTime();
+        //SetActingUnit();
 
-        SetActingUnit();
+        //if a unit is not acting, advance ATguages until one does and set next to act 
+        if (!isUnitActing)
+        {
+            AdvanceACTGuagesTurnBased();           
+        }
 
         if(isUnitActing)
         {
-            
-        
-            DetermineTargets();
+            actingUnit.sheet.action_Next.UpdateAction();
 
-            Debug.Log(actingUnit.sheet.characterName + " is attacking " +targetedUnits[0].sheet.characterName);
-
-            RollToHit();
-
-            if(roll < toHitChance)
+            if(actingUnit.sheet.action_Next.isTriggerEffect)
             {
-                RollDamage();
+                DetermineTargets();
 
+                Debug.Log(actingUnit.sheet.characterName + " is attacking " + targetedUnits[0].sheet.characterName);
+
+                RollToHit();
+
+                if(roll < toHitChance)
+                {
+                    RollDamage();                  
+                }
+                else  //miss
+                {
+                    damage = 0;
+                }
 
                 ApplyDamage();
+
+                CalculateActOrder();
+                actingUnit.sheet.action_Next.isTriggerEffect = false;
+                actingUnit.sheet.action_Next.isEffectResolved = true;
             }
-            
-            CalculateActOrder();
+            if (actingUnit.sheet.action_Next.isActionFinished)
+            {
+                isUnitActing = false;
+            }
 
         }
 
@@ -141,62 +157,14 @@ public class BattleManager : MonoBehaviour {
     {
         for(int i = 0; i < unitsInBattle.Count; i++)
         {
+            unitsInBattle[i].sheet.action_Next = DataManager.DM.actions[unitsInBattle[i].sheet.action_FrontRow]; //temp, initialize newt action
             unitsInBattle[i].sheet.actGuage = Random.Range(0f, 75f);
         }
     }
 
-    //speed formula: Add to act guage each combat tick
-    void AdvanceACTGuages()
-    {
-        unitsLeftInBattle = 0;
-        for(int i = 0; i < unitsInBattle.Count; i++)
-        {
-            //conditions: unit hp>0, 
-            if(unitsInBattle[i].sheet.stats.HitPoints > 0)
-            {
+    
 
-                unitsLeftInBattle += 1;
-            }
-        }
-        
 
-        for(int i = 0; i < unitsInBattle.Count; i++)
-        {
-            //conditions: unit hp>0, 
-            if(unitsInBattle[i].sheet.stats.HitPoints > 0)
-            {
-                
-                unitsInBattle[i].sheet.actGuage += (10f/unitsLeftInBattle) * Time.deltaTime * (2.5f * Mathf.Sqrt(unitsInBattle[i].sheet.stats.Speed + 25f));
-            }
-        }
-    }
-
-    //determine which unit will be acting this frame (max ACT) if over 100 ACT and flag the frame for a unit acting and set reference to acting unit
-    void SetActingUnit()
-    {
-        isUnitActing = false;
-
-        //get max value and index
-        maxAct = 0;
-        index = 0;
-        for(int i = 0; i < unitsInBattle.Count; i++)
-        {
-            if(unitsInBattle[i].sheet.actGuage > maxAct)
-            {
-                maxAct = unitsInBattle[i].sheet.actGuage;
-                index = i;
-            }
-        }
-
-        //if the max is over the act value of 100, subtract 100 and flag to act
-        if(maxAct > 100f)
-        {
-            isUnitActing = true;
-            actingUnit = unitsInBattle[index];
-            unitsInBattle[index].sheet.actGuage -= 100;
-            unitsInBattle[index].piece.Animate_Attack();
-        }
-    }
 
     //dertemine targets of the action and store in targetedUnits[]
     void DetermineTargets()
@@ -208,15 +176,15 @@ public class BattleManager : MonoBehaviour {
         //reset targetunits array 
         targetedUnits = new List<Character>(unitsInBattle);
     
-        switch (targetType)
+        switch (actingUnit.sheet.action_Next.targetType)
         {
-            case TargetType.Self:
+            case TargetType.SELF:
                 {
                     targetedUnits.Clear();
                     targetedUnits.Add(actingUnit);
                     break;
                 }
-            case TargetType.EnemySingleMelee:  //taget nearest with preference to same horizontal
+            case TargetType.ENEMY_SINGLE_MELEE:  //taget nearest with preference to same horizontal
                 {
                     Target_RemoveAllies();
                     Target_RemoveFallen();
@@ -224,20 +192,20 @@ public class BattleManager : MonoBehaviour {
                     Target_RandomSelectOne();
                     break;
                 }
-            case TargetType.EnemySingleRanged: //target nearest in backmost row
+            case TargetType.ENEMY_SINGLE_RANGED: //target nearest in backmost row
                 {
                     Target_BackRow(); //no need to remove allies/fallen as it polls squad directly
                     Target_Nearest();
                     break;
                 }
-            case TargetType.EnemySingleRandom:
+            case TargetType.ENEMY_SINGLE_RANDOM:
                 {
                     Target_RemoveAllies();
                     Target_RemoveFallen();
                     Target_RandomSelectOne();
                     break;
                 }
-            case TargetType.EnemySingleLowestHP:
+            case TargetType.ENEMY_LOWESTHP:
                 {
                     Target_RemoveAllies();
                     Target_RemoveFallen();
@@ -245,7 +213,7 @@ public class BattleManager : MonoBehaviour {
                     Target_RandomSelectOne();
                     break;
                 }
-            case TargetType.EnemySingleHighestHP:
+            case TargetType.ENEMY_HIGHESTHP:
                 {
                     Target_RemoveAllies();
                     Target_RemoveFallen();
@@ -253,14 +221,14 @@ public class BattleManager : MonoBehaviour {
                     Target_RandomSelectOne();
                     break;
                 }
-            case TargetType.AllySingleFallen:
+            case TargetType.ALLY_SINGLE_FALLEN:
                 {
                     Target_RemoveEnemies();
                     Target_RemoveUnfallen();
                     Target_RandomSelectOne();
                     break;
                 }
-            case TargetType.AllySingleLowestHP:
+            case TargetType.ALLY_LOWESTHP:
                 {
                     Target_RemoveEnemies();
                     Target_RemoveFallen();
@@ -268,7 +236,7 @@ public class BattleManager : MonoBehaviour {
                     Target_RandomSelectOne();
                     break;
                 }
-            case TargetType.AllySingleHighestHP:
+            case TargetType.ALLY_HIGHESTHP:
                 {
                     Target_RemoveEnemies();
                     Target_RemoveFallen();
@@ -276,7 +244,7 @@ public class BattleManager : MonoBehaviour {
                     Target_RandomSelectOne();
                     break;
                 }
-            case TargetType.AllySingleRandom:
+            case TargetType.ALLY_SINGLE_RANDOM:
                 {
                     Target_RemoveEnemies();
                     Target_RemoveFallen();
@@ -423,7 +391,7 @@ public class BattleManager : MonoBehaviour {
         //remove fallen
         for(int i = targetedUnits.Count - 1; i >= 0; i--)
         {
-            if(targetedUnits[i].sheet.stats.HitPoints <= 0)
+            if(targetedUnits[i].sheet.stats.hitPoints <= 0)
             {
                 targetedUnits.RemoveAt(i);
             }
@@ -435,7 +403,7 @@ public class BattleManager : MonoBehaviour {
         //remove unfallen
         for(int i = targetedUnits.Count - 1; i >= 0; i--)
         {
-            if(targetedUnits[i].sheet.stats.HitPoints > 0)
+            if(targetedUnits[i].sheet.stats.hitPoints > 0)
             {
                 targetedUnits.RemoveAt(i);
             }
@@ -449,14 +417,14 @@ public class BattleManager : MonoBehaviour {
         //get closest
         for(int i = 0; i < targetedUnits.Count; i++)
         {   
-            if(targetedUnits[i].sheet.stats.HitPoints == lowest)
+            if(targetedUnits[i].sheet.stats.hitPoints == lowest)
             {
                 selectUnits.Add(targetedUnits[i]);
             }
-            else if(targetedUnits[i].sheet.stats.HitPoints < lowest)
+            else if(targetedUnits[i].sheet.stats.hitPoints < lowest)
             {
                 selectUnits.Clear();
-                lowest = targetedUnits[i].sheet.stats.HitPoints;
+                lowest = targetedUnits[i].sheet.stats.hitPoints;
                 selectUnits.Add(targetedUnits[i]);
             }
         }
@@ -472,14 +440,14 @@ public class BattleManager : MonoBehaviour {
         //get closest
         for(int i = 0; i < targetedUnits.Count; i++)
         {
-            if(targetedUnits[i].sheet.stats.HitPoints == highest)
+            if(targetedUnits[i].sheet.stats.hitPoints == highest)
             {
                 selectUnits.Add(targetedUnits[i]);
             }
-            else if(targetedUnits[i].sheet.stats.HitPoints > highest)
+            else if(targetedUnits[i].sheet.stats.hitPoints > highest)
             {
                 selectUnits.Clear();
-                highest = targetedUnits[i].sheet.stats.HitPoints;
+                highest = targetedUnits[i].sheet.stats.hitPoints;
                 selectUnits.Add(targetedUnits[i]);
             }
         }
@@ -490,10 +458,10 @@ public class BattleManager : MonoBehaviour {
    
     void RollToHit()
     {
-        toHitChance = GameSettings.phyHit_baseToHitChance;
-        toHitChance = toHitChance * (1 + (GameSettings.phyHit_AttributeWeight * (actingUnit.sheet.stats.Agility + GameSettings.phyHit_RangeSpreadConstant) / 100f));
+        toHitChance = actingUnit.sheet.action_Next.baseChanceToHit;
+        toHitChance = toHitChance * (1 + (GameSettings.phyHit_AttributeWeight * (actingUnit.sheet.stats.agility + GameSettings.phyHit_RangeSpreadConstant) / 100f));
         toHitChance = toHitChance * (1 + (GameSettings.phyHit_LevelWeight * (actingUnit.sheet.level + GameSettings.phyHit_RangeSpreadConstant) / 100f));
-        toHitChance = toHitChance * (1f / (1 + (GameSettings.phyHit_AttributeWeight * (targetedUnits[0].sheet.stats.Agility + GameSettings.phyHit_RangeSpreadConstant) / 100f)));
+        toHitChance = toHitChance * (1f / (1 + (GameSettings.phyHit_AttributeWeight * (targetedUnits[0].sheet.stats.agility + GameSettings.phyHit_RangeSpreadConstant) / 100f)));
         toHitChance = toHitChance * (1f / (1 + (GameSettings.phyHit_LevelWeight * (targetedUnits[0].sheet.level + GameSettings.phyHit_RangeSpreadConstant) / 100f)));
         roll = Random.Range(0f, 1f);
         Debug.Log("Chance to Hit : " + toHitChance.ToString() + "   Rolled : " + roll.ToString());
@@ -501,8 +469,9 @@ public class BattleManager : MonoBehaviour {
 
     void RollDamage()
     {
-        damage = GameSettings.phyDamage_baseDamage;
-        damage = damage * (1 + (GameSettings.phyDamage_AttributeWeight * (actingUnit.sheet.stats.Strength + GameSettings.phyDamage_RangeSpreadConstant) / 100f));
+        damage = GameSettings.phyDamage_baseDamage + (GameSettings.phyDamage_additionalBaseDamagePerLevel*actingUnit.sheet.level);
+        damage = damage * actingUnit.sheet.action_Next.baseDamageMultiplier;
+        damage = damage * (1 + (GameSettings.phyDamage_AttributeWeight * (actingUnit.sheet.stats.strength + GameSettings.phyDamage_RangeSpreadConstant) / 100f));
         damage = damage * (1 + (GameSettings.phyDamage_LevelWeight * (actingUnit.sheet.level + GameSettings.phyDamage_RangeSpreadConstant) / 100f));
         roll = damage * Random.Range(1-GameSettings.phyDamage_variance, 1+ GameSettings.phyDamage_variance);
         damage = roll;
@@ -512,15 +481,15 @@ public class BattleManager : MonoBehaviour {
     void ApplyDamage()
     {
         //vitality reduction
-        damage = damage * (1f / (1 + (GameSettings.phyDamageResist_AttributeWeight * targetedUnits[0].sheet.stats.Vitality / 100f)));
+        damage = damage * (1f / (1 + (GameSettings.phyDamageResist_AttributeWeight * targetedUnits[0].sheet.stats.toughness / 100f)));
         damage = damage * (1f / (1 + (GameSettings.phyDamageResist_LevelWeight * targetedUnits[0].sheet.level/ 100f)));
 
 
         targetedUnits[0].piece.ShowDamage((int)damage);
-        targetedUnits[0].sheet.stats.HitPoints -= (int)damage;
-        if (targetedUnits[0].sheet.stats.HitPoints <= 0)
+        targetedUnits[0].sheet.stats.hitPoints -= (int)damage;
+        if (targetedUnits[0].sheet.stats.hitPoints <= 0)
         {
-            targetedUnits[0].sheet.stats.HitPoints = 0;
+            targetedUnits[0].sheet.stats.hitPoints = 0;
             targetedUnits[0].piece.GetComponent<SpriteRenderer>().color *= 0.2f;
         }
 
@@ -550,9 +519,9 @@ public class BattleManager : MonoBehaviour {
             for(int i = 0; i < unitsInBattle.Count; i++)
             {                  
                 //conditions: unit hp>0, 
-                if(unitsInBattle[i].sheet.stats.HitPoints > 0)
+                if(unitsInBattle[i].sheet.stats.hitPoints > 0)
                 {        
-                    futureActGuage[i] += 0.2f *(2.5f * Mathf.Sqrt(unitsInBattle[i].sheet.stats.Speed + 25f));
+                    futureActGuage[i] += 0.1f *(2.5f * Mathf.Sqrt(unitsInBattle[i].sheet.stats.speed + 25f));
                     isConditionsMet = true;
                 }
             }
@@ -578,7 +547,7 @@ public class BattleManager : MonoBehaviour {
             //if the max is over the act value of 100, subtract 100 and add as next ot act to our list
             if (maxAct > 100f)
             {
-                futureActGuage[index] -= 100;
+                futureActGuage[index] -= unitsInBattle[index].sheet.action_Next.guageUsed;
                 unitActOrder.Add(unitsInBattle[index]);
             }
 
@@ -593,7 +562,108 @@ public class BattleManager : MonoBehaviour {
     } //end function
 
 
+    //determine which unit will be acting this frame (max ACT) if over 100 ACT and flag the frame for a unit acting and set reference to acting unit
+    void SetActingUnit()
+    {
+        isUnitActing = false;
 
+        //get max value and index
+        maxAct = 0;
+        index = 0;
+        for(int i = 0; i < unitsInBattle.Count; i++)
+        {
+            if(unitsInBattle[i].sheet.actGuage > maxAct)
+            {
+                maxAct = unitsInBattle[i].sheet.actGuage;
+                index = i;
+            }
+        }
+
+        //if the max is over the act value of 100, subtract 100 and flag to act
+        if(maxAct > 100f)
+        {
+            isUnitActing = true;
+            actingUnit = unitsInBattle[index];
+            unitsInBattle[index].sheet.actGuage -= unitsInBattle[index].sheet.action_Next.guageUsed;
+            unitsInBattle[index].piece.Animate_Attack();
+        }
+    }
+
+
+    //speed formula: Add to act guage each combat tick
+    void AdvanceACTGuagesRealTime()
+    {
+        unitsLeftInBattle = 0;
+        for(int i = 0; i < unitsInBattle.Count; i++)
+        {
+            //conditions: unit hp>0, 
+            if(unitsInBattle[i].sheet.stats.hitPoints > 0)
+            {
+
+                unitsLeftInBattle += 1;
+            }
+        }
+
+
+        for(int i = 0; i < unitsInBattle.Count; i++)
+        {
+            //conditions: unit hp>0, 
+            if(unitsInBattle[i].sheet.stats.hitPoints > 0)
+            {
+
+                unitsInBattle[i].sheet.actGuage += (10f / unitsLeftInBattle) * Time.deltaTime * (2.5f * Mathf.Sqrt(unitsInBattle[i].sheet.stats.speed + 25f));
+            }
+        }
+    }
+
+    //speed formula: Add to act guage each combat tick
+    void AdvanceACTGuagesTurnBased()
+    {
+        bool isConditionsMet = false;
+        while(!isUnitActing)
+        {
+
+            //check all units speed and advance out future act guage
+            for(int i = 0; i < unitsInBattle.Count; i++)
+            {
+                //conditions: unit hp>0, 
+                if(unitsInBattle[i].sheet.stats.hitPoints > 0)
+                {
+                    unitsInBattle[i].sheet.actGuage += 0.1f * (2.5f * Mathf.Sqrt(unitsInBattle[i].sheet.stats.speed + 25f));
+                    isConditionsMet = true;
+                }
+            }
+
+            if(!isConditionsMet) //failsafe
+            {
+                Debug.Log("Error: No units gaining Act in battle");
+                return;
+            }
+
+            //get max value and index
+            maxAct = 0;
+            index = 0;
+            for(int i = 0; i < unitsInBattle.Count; i++)
+            {
+                if(unitsInBattle[i].sheet.actGuage > maxAct)
+                {
+                    maxAct = unitsInBattle[i].sheet.actGuage;
+                    index = i;
+                }
+            }
+
+            //if the max is over the act value of 100, subtract action value and flag unit as acting
+            if(maxAct > 100f)
+            {
+                isUnitActing = true;
+                actingUnit = unitsInBattle[index];
+                unitsInBattle[index].sheet.actGuage -= unitsInBattle[index].sheet.action_Next.guageUsed;
+                actingUnit.sheet.action_Next.StartAction();
+                actingUnit.piece.Animate_Attack();
+            }
+        } //repeat while no unit set to act
+
+    }
 
 }
 

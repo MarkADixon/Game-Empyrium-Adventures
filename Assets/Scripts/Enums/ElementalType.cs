@@ -1,7 +1,7 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System;
 
+
+[Serializable]
 public enum ElementalType {
-
-	None, Fire, Water, Earth, Wind, Light, Shadow
+    NONE, FIRE, WATER, EARTH, WIND, LIGHT, SHADOW
 }

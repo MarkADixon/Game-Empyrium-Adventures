@@ -1,9 +1,9 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System;
 
+[Serializable]
 public enum TargetType
 {
-    Self,
-    EnemySingleLowestHP, EnemySingleHighestHP, EnemySingleMelee, EnemySingleRanged, EnemySingleRandom,
-    AllySingleLowestHP, AllySingleHighestHP, AllySingleFallen, AllySingleRandom
+    SELF,
+    ENEMY_LOWESTHP, ENEMY_HIGHESTHP, ENEMY_SINGLE_MELEE, ENEMY_SINGLE_RANGED, ENEMY_SINGLE_RANDOM,
+    ALLY_LOWESTHP, ALLY_HIGHESTHP, ALLY_SINGLE_FALLEN, ALLY_SINGLE_RANDOM
 }
