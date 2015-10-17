@@ -75,7 +75,7 @@ public class CharacterPiece : MonoBehaviour
         fixedPosition = gameObject.GetComponent<Transform>().transform.position;
 
 
-        int[] digit = new int[3];
+        int[] digit = new int[4];
         bool isHeal = false;
 
         if(_damage < 0)
@@ -84,7 +84,7 @@ public class CharacterPiece : MonoBehaviour
             _damage *= -1;
         }
 
-        for(int i = 0; i < 3; i++)
+        for(int i = 0; i < 4; i++)
         {
             digit[i] = _damage % 10;
             _damage = (int)_damage / 10;
@@ -92,7 +92,22 @@ public class CharacterPiece : MonoBehaviour
 
         GameObject damageNumberClone;
         DamageNumber dn;
-        if(digit[2] != 0)
+        if(digit[3]!=0)
+        {
+            damageNumberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
+            dn = (DamageNumber)damageNumberClone.GetComponent<DamageNumber>();
+            dn.Create(digit[0], fixedPosition + new Vector3(0.9f, 0f, 0f), isHeal, 0.4f);
+            damageNumberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
+            dn = (DamageNumber)damageNumberClone.GetComponent<DamageNumber>();
+            dn.Create(digit[1], fixedPosition + new Vector3(0.3f, 0f, 0f), isHeal, 0.2f);
+            damageNumberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
+            dn = (DamageNumber)damageNumberClone.GetComponent<DamageNumber>();
+            dn.Create(digit[2], fixedPosition + new Vector3(-0.3f, 0f, 0f), isHeal, 0f);
+            damageNumberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
+            dn = (DamageNumber)damageNumberClone.GetComponent<DamageNumber>();
+            dn.Create(digit[3], fixedPosition + new Vector3(-0.9f, 0f, 0f), isHeal, 0f);
+        }
+        if(digit[3] == 0 && digit[2] != 0)
         {
             damageNumberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
             dn = (DamageNumber)damageNumberClone.GetComponent<DamageNumber>();
@@ -104,7 +119,7 @@ public class CharacterPiece : MonoBehaviour
             dn = (DamageNumber)damageNumberClone.GetComponent<DamageNumber>();
             dn.Create(digit[2], fixedPosition + new Vector3(-0.6f, 0f, 0f), isHeal, 0f);
         }
-        if(digit[2] == 0 && digit[1] != 0)
+        if(digit[3] == 0 && digit[2] == 0 && digit[1] != 0)
         {
             damageNumberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
             dn = (DamageNumber)damageNumberClone.GetComponent<DamageNumber>();
@@ -113,7 +128,7 @@ public class CharacterPiece : MonoBehaviour
             dn = (DamageNumber)damageNumberClone.GetComponent<DamageNumber>();
             dn.Create(digit[1], fixedPosition + new Vector3(-0.3f, 0f, 0f), isHeal, 0f);
         }
-        if(digit[2] == 0 && digit[1] == 0)
+        if(digit[3] == 0 && digit[2] == 0 && digit[1] == 0)
         {
             damageNumberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
             dn = (DamageNumber)damageNumberClone.GetComponent<DamageNumber>();

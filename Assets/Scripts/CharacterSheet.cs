@@ -9,10 +9,12 @@ public class CharacterSheet
 {
     //character values
     public string characterName = "No Name";
+    public string characterClass = "Junker";
     public int level = 1;
     public int experience = 0;
-    public CharacterType characterType = CharacterType.JUNKER;
-    public SizeType size = SizeType.MEDIUM;
+
+    public SizeType size = SizeType.NORMAL;
+    public ElementalType elementalType = ElementalType.NONE;
     public bool isElite = false;
     public bool isPlayer = false;
 
@@ -27,10 +29,9 @@ public class CharacterSheet
     //combat
     public float actGuage = 0f;
     public Action action_Next;
-    public ActionType action_FrontRow;
-    public ActionType action_BackRow;
-    //public Action SpecialAction_A;
-    //public Action SpecialAction_B;
+    public List<Action> actions_FrontRow;
+    public List<Action> actions_BackRow;
+    public List<Action> actions_Activated;
     //public Ability Active;
     //public Ability Passive;
     //public List<Action> knownActions = new List<Action>();
@@ -42,29 +43,29 @@ public class CharacterSheet
 [Serializable]
 public class CharacterStats
 {
-    public int hitPoints, moralePoints;
+    public int hitPoints;
     public int strength, toughness, agility;
     public int magic, spirit, mind;
-    public int charisma, resolve, wit;
-    public int speed, luck;
-    public int move, alignment; 
+    public int charisma, resolve;
+    public int speed,luck;
+    //public int move;
+    public float alignment,morale; 
     public CharacterStats()
     {
-        hitPoints = 100;
-        moralePoints = 100;
-        strength = 0;
-        toughness = 0;
-        agility = 0;
-        magic = 0;
-        spirit = 0;
-        mind = 0;
-        charisma = 0;
-        resolve = 0;
-        wit = 0;
-        speed = 0;
-        luck = 0;
-        move = 0;
+        hitPoints = 0;
+        strength = 1;
+        toughness = 1;
+        agility = 1;
+        magic = 1;
+        spirit = 1;
+        mind = 1;
+        charisma = 1;
+        resolve = 1;
+        speed = 1;
+        luck = 1;
+        //move = 1;
         alignment = 0;
+        morale = 100f;
     }
 
 

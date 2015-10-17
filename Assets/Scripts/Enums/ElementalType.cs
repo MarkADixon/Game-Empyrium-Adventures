@@ -3,5 +3,5 @@
 
 [Serializable]
 public enum ElementalType {
-    NONE, FIRE, WATER, EARTH, WIND, LIGHT, SHADOW
+    NONE, FIRE=1, EARTH=2, AIR=3, WATER=4, LIGHT=5, SHADOW=6
 }

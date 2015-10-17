@@ -23,11 +23,12 @@ public class DataManager : MonoBehaviour
     public List<Squad> enemySquads = new List<Squad>();
 
     //reference data
-    public Dictionary<ActionType, Action> actions = new Dictionary<ActionType, Action>();
+    public Dictionary<string, Action> actionDictionary = new Dictionary<string, Action>();
+    public Dictionary<string, CharacterClass> characterClassDictionary = new Dictionary<string, CharacterClass>();
 
     //resources   
     GameObject prefabCharacterPiece;
-    TextAsset actionDataFile;
+    TextAsset actionDataFile, classDataFile;
 
 
 
@@ -46,22 +47,27 @@ public class DataManager : MonoBehaviour
     // Use this for initialization
     void Awake()
     {
-        if (DM == null) DM = this;
-        else Destroy(gameObject);
+        if(DM == null)
+            DM = this;
+        else
+            Destroy(gameObject);
 
         DontDestroyOnLoad(gameObject);
 
         //resource initialization
         prefabCharacterPiece = (GameObject)Resources.Load("characterPiece");
 
-        actionDataFile = (TextAsset)Resources.Load("Data/ActionData",typeof(TextAsset));
+        actionDataFile = (TextAsset)Resources.Load("Data/ActionData", typeof(TextAsset));
         InitializeActionData();
+
+        classDataFile = (TextAsset)Resources.Load("Data/ClassData", typeof(TextAsset));
+        InitializeClassData();
     }
 
 
     void Start()
     {
-       
+
     }
 
     // Update is called once per frame
@@ -75,6 +81,8 @@ public class DataManager : MonoBehaviour
     {
 
     }
+
+
 
     #region Save/Load Game
     public void Save()
@@ -100,7 +108,7 @@ public class DataManager : MonoBehaviour
 
     public void Load()
     {
-        if (File.Exists(Application.persistentDataPath + "/savegame.dat"))
+        if(File.Exists(Application.persistentDataPath + "/savegame.dat"))
         {
             Init(); //clears data and initializes lists
 
@@ -108,7 +116,7 @@ public class DataManager : MonoBehaviour
             BinaryFormatter bf = new BinaryFormatter();
             FileStream file = File.Open(Application.persistentDataPath + "/savegame.dat", FileMode.Open);
             FileData data = (FileData)bf.Deserialize(file);
-            
+
             file.Close();
 
             //restore data to other objects
@@ -129,9 +137,9 @@ public class DataManager : MonoBehaviour
     public void InitializeLoadedData()
     {
         //create pieces for each sheet then add characters to player army
-        for (int i = 0; i < playerSheets.Count; i++)
+        for(int i = 0; i < playerSheets.Count; i++)
         {
-            GameObject newPiece = (GameObject)Instantiate(prefabCharacterPiece,Vector3.zero, Quaternion.identity);
+            GameObject newPiece = (GameObject)Instantiate(prefabCharacterPiece, Vector3.zero, Quaternion.identity);
             Character newCharacter = new Character(playerSheets[i], newPiece.GetComponent<CharacterPiece>());
             playerArmy.Add(newCharacter);
         }
@@ -161,141 +169,65 @@ public class DataManager : MonoBehaviour
 
         XmlDocument xmlDocument = new XmlDocument();
         xmlDocument.LoadXml(actionDataFile.text);
-        XmlNodeList actionDataItems = xmlDocument.GetElementsByTagName("Action");
+        XmlNodeList actionDataNodes = xmlDocument.GetElementsByTagName("Action");
 
-        foreach(XmlNode actionDataItem in actionDataItems)
+        foreach(XmlNode actionDataNode in actionDataNodes)
         {
-            XmlNodeList actionContent = actionDataItem.ChildNodes;
+            XmlNodeList actionSubNodes = actionDataNode.ChildNodes;
             actionDataElements = new Dictionary<string, string>();
-            foreach(XmlNode tag in actionContent)
+            foreach(XmlNode tag in actionSubNodes)
             {
-                switch(tag.Name)
-                {
-                    case "ActionType":
-                        {
-                            actionDataElements.Add("ActionType", tag.InnerText);
-                            break;
-                        }
-                    case "CharacterType":
-                        {
-                            actionDataElements.Add("CharacterType", tag.InnerText);
-                            break;
-                        }
-                    case "ActionSlotType":
-                        {
-                            actionDataElements.Add("ActionSlotType", tag.InnerText);
-                            break;
-                        }
-                    case "DisplayName":
-                        {
-                            actionDataElements.Add("DisplayName", tag.InnerText);
-                            break;
-                        }
-                    case "TargetType":
-                        {
-                            actionDataElements.Add("TargetType", tag.InnerText);
-                            break;
-                        }
-                    case "ElementalType":
-                        {
-                            actionDataElements.Add("ElementalType", tag.InnerText);
-                            break;
-                        }
-                    case "BaseDamageMultiplier":
-                        {
-                            actionDataElements.Add("BaseDamageMultiplier", tag.InnerText);
-                            break;
-                        }
-                    case "BaseChanceToHit":
-                        {
-                            actionDataElements.Add("BaseChanceToHit", tag.InnerText);
-                            break;
-                        }
-                    case "GuageUsed":
-                        {
-                            actionDataElements.Add("GuageUsed", tag.InnerText);
-                            break;
-                        }
-                    case "AttackType":
-                        {
-                            actionDataElements.Add("AttackType", tag.InnerText);
-                            break;
-                        }
-                    case "DamageType":
-                        {
-                            actionDataElements.Add("DamageType", tag.InnerText);
-                            break;
-                        }
-                    case "StatusType":
-                        {
-                            actionDataElements.Add("StatusType", tag.InnerText);
-                            break;
-                        }
-                    case "StatusDuration":
-                        {
-                            actionDataElements.Add("StatusDuration", tag.InnerText);
-                            break;
-                        }
-                    case "PrimaryPowerStat":
-                        {
-                            actionDataElements.Add("PrimaryPowerStat", tag.InnerText);
-                            break;
-                        }
-                    case "PrimaryPowerStatWeight":
-                        {
-                            actionDataElements.Add("PrimaryPowerStatWeight", tag.InnerText);
-                            break;
-                        }
-                    case "SecondaryPowerStat":
-                        {
-                            actionDataElements.Add("SecondaryPowerStat", tag.InnerText);
-                            break;
-                        }
-                    case "SecondaryPowerStatWeight":
-                        {
-                            actionDataElements.Add("SecondaryPowerStatWeight", tag.InnerText);
-                            break;
-                        }
-                    case "PrimaryDefenseStat":
-                        {
-                            actionDataElements.Add("PrimaryDefenseStat", tag.InnerText);
-                            break;
-                        }
-                    case "PrimaryDefenseStatWeight":
-                        {
-                            actionDataElements.Add("PrimaryDefenseStatWeight", tag.InnerText);
-                            break;
-                        }
-                    case "SecondaryDefenseStat":
-                        {
-                            actionDataElements.Add("SecondaryDefenseStat", tag.InnerText);
-                            break;
-                        }
-                    case "SecondaryDefenseStatWeight":
-                        {
-                            actionDataElements.Add("SecondaryDefenseStatWeight", tag.InnerText);
-                            break;
-                        }
-                    default:
-                        {
-                            break;
-                        }
-                }//end switch
+                actionDataElements.Add(tag.Name, tag.InnerText);
             }//end for each tag in action
 
             //initialize an Action and store it for game use
             newAction = new Action(actionDataElements);
-            actions.Add(newAction.actionType, newAction);
+            actionDictionary.Add(newAction.actionName, newAction);
 
         }//end of for each action in xml
         return;
     }//end of InitializeActionData()
 
+    void InitializeClassData()
+    {
+        Dictionary<string, string> classDataElements = new Dictionary<string, string>();
+        CharacterClass newCharClass;
+
+        XmlDocument xmlDocument = new XmlDocument();
+        xmlDocument.LoadXml(classDataFile.text);
+        XmlNodeList classNodes = xmlDocument.GetElementsByTagName("CharacterClass");
+
+        foreach(XmlNode classNode in classNodes)
+        {
+            XmlNodeList classSubNodes = classNode.ChildNodes;
+            classDataElements = new Dictionary<string, string>();
+            foreach(XmlNode tag in classSubNodes)
+            {
+                if(tag.Name == "StatOnLevelUpOdds")
+                {
+                    XmlNodeList levelUpSubNodes = tag.ChildNodes;
+                    foreach(XmlNode levelUpTag in levelUpSubNodes)
+                    {
+                        classDataElements.Add(levelUpTag.Name, levelUpTag.InnerText);
+                    }
+                }
+                else
+                {
+                    classDataElements.Add(tag.Name, tag.InnerText);
+                }
+            }//end for each tag in action
+
+            //initialize an Class and store it for game use
+            newCharClass = new CharacterClass(classDataElements);
+            characterClassDictionary.Add(newCharClass.name, newCharClass);
+        }
+    }
+
 
 
 
 }
-
+            
 [Serializable]
 public class FileData
 {
@@ -304,6 +236,7 @@ public class FileData
    public List<CharacterSheet> playerSheets = new List<CharacterSheet>();
    public List<CharacterSheet> enemySheets = new List<CharacterSheet>(); 
 }
+
 
 
 

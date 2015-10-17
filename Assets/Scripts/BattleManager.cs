@@ -157,7 +157,9 @@ public class BattleManager : MonoBehaviour {
     {
         for(int i = 0; i < unitsInBattle.Count; i++)
         {
-            unitsInBattle[i].sheet.action_Next = DataManager.DM.actions[unitsInBattle[i].sheet.action_FrontRow]; //temp, initialize newt action
+            //temp, initialize new action
+            unitsInBattle[i].sheet.action_Next = DataManager.DM.characterClassDictionary[unitsInBattle[i].sheet.characterClass].forwardActions[0];
+
             unitsInBattle[i].sheet.actGuage = Random.Range(0f, 75f);
         }
     }
@@ -470,12 +472,65 @@ public class BattleManager : MonoBehaviour {
     void RollDamage()
     {
         damage = GameSettings.phyDamage_baseDamage + (GameSettings.phyDamage_additionalBaseDamagePerLevel*actingUnit.sheet.level);
-        damage = damage * actingUnit.sheet.action_Next.baseDamageMultiplier;
-        damage = damage * (1 + (GameSettings.phyDamage_AttributeWeight * (actingUnit.sheet.stats.strength + GameSettings.phyDamage_RangeSpreadConstant) / 100f));
-        damage = damage * (1 + (GameSettings.phyDamage_LevelWeight * (actingUnit.sheet.level + GameSettings.phyDamage_RangeSpreadConstant) / 100f));
-        roll = damage * Random.Range(1-GameSettings.phyDamage_variance, 1+ GameSettings.phyDamage_variance);
+        roll = damage * Random.Range(1 - GameSettings.phyDamage_variance, 1 + GameSettings.phyDamage_variance);
         damage = roll;
-        
+        Debug.Log("base damage : " + damage.ToString());
+        damage = damage * (1 + (GameSettings.phyDamage_AttributeWeight * (actingUnit.sheet.stats.strength + GameSettings.phyDamage_RangeSpreadConstant) / 100f));
+        damage = damage * actingUnit.sheet.action_Next.baseDamageMultiplier;
+        float elementMultiplier = 1.0f;
+        switch(actingUnit.sheet.elementalType)
+        {
+            case (ElementalType.FIRE):
+                {
+                    if(targetedUnits[0].sheet.elementalType == ElementalType.EARTH)
+                        elementMultiplier *= GameSettings.elementalStrengthMultiplier;
+                    else if (targetedUnits[0].sheet.elementalType == ElementalType.WATER)
+                        elementMultiplier /= GameSettings.elementalStrengthMultiplier;
+                    break;
+                }
+            case (ElementalType.EARTH):
+                {
+                    if(targetedUnits[0].sheet.elementalType == ElementalType.AIR)
+                        elementMultiplier *= GameSettings.elementalStrengthMultiplier;
+                    else if(targetedUnits[0].sheet.elementalType == ElementalType.FIRE)
+                        elementMultiplier /= GameSettings.elementalStrengthMultiplier;
+                    break;
+                }
+            case (ElementalType.AIR):
+                {
+                    if(targetedUnits[0].sheet.elementalType == ElementalType.WATER)
+                        elementMultiplier *= GameSettings.elementalStrengthMultiplier;
+                    else if(targetedUnits[0].sheet.elementalType == ElementalType.EARTH)
+                        elementMultiplier /= GameSettings.elementalStrengthMultiplier;
+                    break;
+                }
+            case (ElementalType.WATER):
+                {
+                    if(targetedUnits[0].sheet.elementalType == ElementalType.FIRE)
+                        elementMultiplier *= GameSettings.elementalStrengthMultiplier;
+                    else if(targetedUnits[0].sheet.elementalType == ElementalType.AIR)
+                        elementMultiplier /= GameSettings.elementalStrengthMultiplier;
+                    break;
+                }
+            default:
+                break;
+        }
+        if(elementMultiplier > 1.2f)
+            Debug.Log("Elemental Strength!");
+        if(elementMultiplier < 0.8f)
+            Debug.Log("Elemental Weakness!");
+        damage = damage * elementMultiplier;
+
+        //temporary critical hit check
+        if (Random.Range(0f,1f)<0.1f)
+        {
+            Debug.Log("Critical Hit!");
+            damage *= 1.5f;
+        }
+
+
+
+        Debug.Log("damage dealt: " +damage.ToString());
     }
 
     void ApplyDamage()
@@ -484,6 +539,14 @@ public class BattleManager : MonoBehaviour {
         damage = damage * (1f / (1 + (GameSettings.phyDamageResist_AttributeWeight * targetedUnits[0].sheet.stats.toughness / 100f)));
         damage = damage * (1f / (1 + (GameSettings.phyDamageResist_LevelWeight * targetedUnits[0].sheet.level/ 100f)));
 
+        //temporary critical hit check
+        if(Random.Range(0f, 1f) < 0.1f)
+        {
+            Debug.Log("Critical Defense!");
+            damage /= 1.5f;
+        }
+
+        Debug.Log("damage taken: " + damage.ToString());
 
         targetedUnits[0].piece.ShowDamage((int)damage);
         targetedUnits[0].sheet.stats.hitPoints -= (int)damage;
@@ -636,7 +699,7 @@ public class BattleManager : MonoBehaviour {
 
             if(!isConditionsMet) //failsafe
             {
-                Debug.Log("Error: No units gaining Act in battle");
+                //Debug.Log("Error: No units gaining Act in battle");
                 return;
             }
 

@@ -6,10 +6,8 @@ using System.Collections;
 [Serializable]
 public class Action
 {
-    public ActionType actionType;
-    public CharacterType characterType;
-    public ActionSlotType actionSlotType;
-    public string displayName;
+    public string actionName;
+    public string displayName;  
     public TargetType targetType;
     public ElementalType elementalType;
     public float baseDamageMultiplier;
@@ -32,9 +30,7 @@ public class Action
 
     public Action(Dictionary<string,string> actionData)
     {
-        actionType = (ActionType)System.Enum.Parse(typeof(ActionType), actionData["ActionType"].ToString());
-        characterType = (CharacterType)System.Enum.Parse(typeof(CharacterType), actionData["CharacterType"].ToString());
-        actionSlotType = (ActionSlotType)System.Enum.Parse(typeof(ActionSlotType), actionData["ActionSlotType"].ToString());
+        actionName = actionData["ActionName"];
         displayName = actionData["DisplayName"];
         targetType = (TargetType)System.Enum.Parse(typeof(TargetType), actionData["TargetType"].ToString());
         elementalType = (ElementalType)System.Enum.Parse(typeof(ElementalType), actionData["ElementalType"].ToString());
