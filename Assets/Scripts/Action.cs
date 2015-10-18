@@ -15,7 +15,7 @@ public class Action
     public float guageUsed;
     public AttackType attackType;
     public DamageType damageType;
-    public StatusType statusType;
+    public EffectType statusType;
     public int statusDuration;
     public StatType primaryPowerStat,secondaryPowerStat, primaryDefenseStat, secondaryDefenseStat;
     public float primaryPowerStatWeight, secondaryPowerStatWeight,primaryDefenseStatWeight, secondaryDefenseStatWeight;
@@ -39,7 +39,7 @@ public class Action
         guageUsed = float.Parse(actionData["GuageUsed"]);
         attackType = (AttackType)System.Enum.Parse(typeof(AttackType), actionData["AttackType"].ToString());
         damageType = (DamageType)System.Enum.Parse(typeof(DamageType), actionData["DamageType"].ToString());
-        statusType = (StatusType)System.Enum.Parse(typeof(StatusType), actionData["StatusType"].ToString());
+        statusType = (EffectType)System.Enum.Parse(typeof(EffectType), actionData["EffectType"].ToString());
         statusDuration = int.Parse(actionData["StatusDuration"]);
         primaryPowerStat = (StatType)System.Enum.Parse(typeof(StatType), actionData["PrimaryPowerStat"].ToString());
         primaryPowerStatWeight = float.Parse(actionData["PrimaryPowerStatWeight"]);

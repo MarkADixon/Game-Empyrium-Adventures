@@ -207,7 +207,7 @@ public class BattleManager : MonoBehaviour {
                     Target_RandomSelectOne();
                     break;
                 }
-            case TargetType.ENEMY_LOWESTHP:
+            case TargetType.ENEMY_LOWEST_HP:
                 {
                     Target_RemoveAllies();
                     Target_RemoveFallen();
@@ -215,7 +215,7 @@ public class BattleManager : MonoBehaviour {
                     Target_RandomSelectOne();
                     break;
                 }
-            case TargetType.ENEMY_HIGHESTHP:
+            case TargetType.ENEMY_HIGHEST_HP:
                 {
                     Target_RemoveAllies();
                     Target_RemoveFallen();
@@ -230,7 +230,7 @@ public class BattleManager : MonoBehaviour {
                     Target_RandomSelectOne();
                     break;
                 }
-            case TargetType.ALLY_LOWESTHP:
+            case TargetType.ALLY_LOWEST_HP:
                 {
                     Target_RemoveEnemies();
                     Target_RemoveFallen();
@@ -238,7 +238,7 @@ public class BattleManager : MonoBehaviour {
                     Target_RandomSelectOne();
                     break;
                 }
-            case TargetType.ALLY_HIGHESTHP:
+            case TargetType.ALLY_HIGHEST_HP:
                 {
                     Target_RemoveEnemies();
                     Target_RemoveFallen();
@@ -515,10 +515,51 @@ public class BattleManager : MonoBehaviour {
             default:
                 break;
         }
-        if(elementMultiplier > 1.2f)
+        switch(actingUnit.sheet.action_Next.elementalType)
+        {
+            case (ElementalType.FIRE):
+                {
+                    if(targetedUnits[0].sheet.elementalType == ElementalType.EARTH)
+                        elementMultiplier *= GameSettings.elementalStrengthMultiplier;
+                    else if(targetedUnits[0].sheet.elementalType == ElementalType.WATER)
+                        elementMultiplier /= GameSettings.elementalStrengthMultiplier;
+                    break;
+                }
+            case (ElementalType.EARTH):
+                {
+                    if(targetedUnits[0].sheet.elementalType == ElementalType.AIR)
+                        elementMultiplier *= GameSettings.elementalStrengthMultiplier;
+                    else if(targetedUnits[0].sheet.elementalType == ElementalType.FIRE)
+                        elementMultiplier /= GameSettings.elementalStrengthMultiplier;
+                    break;
+                }
+            case (ElementalType.AIR):
+                {
+                    if(targetedUnits[0].sheet.elementalType == ElementalType.WATER)
+                        elementMultiplier *= GameSettings.elementalStrengthMultiplier;
+                    else if(targetedUnits[0].sheet.elementalType == ElementalType.EARTH)
+                        elementMultiplier /= GameSettings.elementalStrengthMultiplier;
+                    break;
+                }
+            case (ElementalType.WATER):
+                {
+                    if(targetedUnits[0].sheet.elementalType == ElementalType.FIRE)
+                        elementMultiplier *= GameSettings.elementalStrengthMultiplier;
+                    else if(targetedUnits[0].sheet.elementalType == ElementalType.AIR)
+                        elementMultiplier /= GameSettings.elementalStrengthMultiplier;
+                    break;
+                }
+            default:
+                break;
+        }
+        if(elementMultiplier > 2f)
+            Debug.Log("Elemental Super Strength!");
+        else if(elementMultiplier > 1.2f)
             Debug.Log("Elemental Strength!");
-        if(elementMultiplier < 0.8f)
-            Debug.Log("Elemental Weakness!");
+        else if(elementMultiplier < 0.8f)
+            Debug.Log("Elemental is Weak!");
+        else if(elementMultiplier < 0.5f)
+            Debug.Log("Elemental Super Weak!");
         damage = damage * elementMultiplier;
 
         //temporary critical hit check
@@ -610,7 +651,7 @@ public class BattleManager : MonoBehaviour {
             //if the max is over the act value of 100, subtract 100 and add as next ot act to our list
             if (maxAct > 100f)
             {
-                futureActGuage[index] -= unitsInBattle[index].sheet.action_Next.guageUsed;
+                futureActGuage[index] -= unitsInBattle[index].sheet.action_Next.guageUsed*100f;
                 unitActOrder.Add(unitsInBattle[index]);
             }
 
@@ -647,7 +688,7 @@ public class BattleManager : MonoBehaviour {
         {
             isUnitActing = true;
             actingUnit = unitsInBattle[index];
-            unitsInBattle[index].sheet.actGuage -= unitsInBattle[index].sheet.action_Next.guageUsed;
+            unitsInBattle[index].sheet.actGuage -= unitsInBattle[index].sheet.action_Next.guageUsed*100f;
             unitsInBattle[index].piece.Animate_Attack();
         }
     }
@@ -720,7 +761,7 @@ public class BattleManager : MonoBehaviour {
             {
                 isUnitActing = true;
                 actingUnit = unitsInBattle[index];
-                unitsInBattle[index].sheet.actGuage -= unitsInBattle[index].sheet.action_Next.guageUsed;
+                unitsInBattle[index].sheet.actGuage -= unitsInBattle[index].sheet.action_Next.guageUsed*100f;
                 actingUnit.sheet.action_Next.StartAction();
                 actingUnit.piece.Animate_Attack();
             }

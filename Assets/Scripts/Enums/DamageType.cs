@@ -3,5 +3,5 @@
 [Serializable]
 public enum DamageType
 {
-    HIT_POINTS, MORALE_POINTS, STATUS
+    HP, MORALE, EFFECT
 }
