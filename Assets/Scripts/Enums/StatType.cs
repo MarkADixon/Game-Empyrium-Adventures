@@ -3,8 +3,9 @@
 [Serializable]
 public enum StatType
 {
-    HIT_POINTS, MORALE_POINTS,
-    STRENGTH, TOUGHNESS, AGILITY, //Strength,Toughness,Agility
+    NONE,
+    HEALTH, MORALE, ACTION,
+    ATTACK, DEFENSE, AGILITY, //Strength,Toughness,Agility
     MAGIC, SPIRIT, MIND,         //Magic,Spirit,Mind
     CHARISMA, RESOLVE,       //Charisma,Will
     SPEED, LUCK,

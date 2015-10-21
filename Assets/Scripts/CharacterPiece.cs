@@ -9,6 +9,7 @@ public class CharacterPiece : MonoBehaviour
     public bool isAttackFinish = false;
     Vector3 fixedPosition = new Vector3(0f, 0f, 0f);
     public int init = 0;
+    public bool isClicked = false;
 
     public GameObject damageNumber;
 
@@ -60,6 +61,14 @@ public class CharacterPiece : MonoBehaviour
         }
         */
     }
+
+
+    public void OnMouseDown()
+    {
+        isClicked = true;
+    }
+
+
     public void Animate_Attack()
     {
         anim.Play("characterPieceAttack");

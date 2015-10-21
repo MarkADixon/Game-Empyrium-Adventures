@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Character
+public class Character 
 {
     public CharacterSheet sheet;
     public CharacterPiece piece;
@@ -12,9 +12,4 @@ public class Character
         piece = _piece;
 	}
 
-    
-
-
-
-	
 }

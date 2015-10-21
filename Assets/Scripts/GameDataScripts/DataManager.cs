@@ -165,23 +165,47 @@ public class DataManager : MonoBehaviour
     void InitializeActionData()
     {
         Dictionary<string, string> actionDataElements = new Dictionary<string, string>();
+        Dictionary<string, string> componentDataElements = new Dictionary<string, string>();
+        List<Dictionary<string,string>> componentList = new List<Dictionary<string, string>>();
         Action newAction;
+        char delimiter = char.Parse("_");
+        string key;
+        string[] keySplit;
 
         XmlDocument xmlDocument = new XmlDocument();
         xmlDocument.LoadXml(actionDataFile.text);
-        XmlNodeList actionDataNodes = xmlDocument.GetElementsByTagName("Action");
+        XmlNodeList actionNodes = xmlDocument.GetElementsByTagName("Action");
 
-        foreach(XmlNode actionDataNode in actionDataNodes)
+        foreach(XmlNode actionNode in actionNodes)
         {
-            XmlNodeList actionSubNodes = actionDataNode.ChildNodes;
+            XmlNodeList actionSubNodes = actionNode.ChildNodes;
             actionDataElements = new Dictionary<string, string>();
+            componentList = new List<Dictionary<string, string>>();
+
             foreach(XmlNode tag in actionSubNodes)
             {
-                actionDataElements.Add(tag.Name, tag.InnerText);
+                key = tag.Name;
+                keySplit = key.Split(delimiter);
+
+                if(keySplit[0] == "Component")
+                {
+                    XmlNodeList componentSubNodes = tag.ChildNodes;
+                    componentDataElements = new Dictionary<string, string>();
+                    componentDataElements.Add(keySplit[0], keySplit[1]);
+                    foreach(XmlNode effectTag in componentSubNodes)
+                    {
+                        componentDataElements.Add(effectTag.Name, effectTag.InnerText);
+                    }
+                    componentList.Add(componentDataElements);
+                }
+                else
+                {
+                    actionDataElements.Add(tag.Name, tag.InnerText);
+                }
             }//end for each tag in action
 
             //initialize an Action and store it for game use
-            newAction = new Action(actionDataElements);
+            newAction = new Action(actionDataElements, componentList);
             actionDictionary.Add(newAction.actionName, newAction);
 
         }//end of for each action in xml

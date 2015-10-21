@@ -34,6 +34,7 @@ public class CharacterClass {
             dataKey = item.Key;
             dataKeySplit = dataKey.Split(delimiter);
             dataKey = dataKeySplit[0];
+            
             switch(dataKey)
             {
                 case "ForwardAction":
@@ -56,15 +57,15 @@ public class CharacterClass {
                         innateBonuses.Add(item.Value);
                         break;
                     }
-                case "STR":
+                case "ATK":
                     {
-                        newOdds = new OddsToStat(float.Parse(item.Value),StatType.STRENGTH);
+                        newOdds = new OddsToStat(float.Parse(item.Value),StatType.ATTACK);
                         levelUpStatOdds.Add(newOdds);  
                         break;
                     }
-                case "TGH":
+                case "DEF":
                     {
-                        newOdds = new OddsToStat(float.Parse(item.Value), StatType.TOUGHNESS);
+                        newOdds = new OddsToStat(float.Parse(item.Value), StatType.DEFENSE);
                         levelUpStatOdds.Add(newOdds);
                         break;
                     }
@@ -144,7 +145,7 @@ public class OddsToStat
 {
     public float initialValue;
     public Vector2 range = new Vector2(0f, 1f);
-    public StatType stat = StatType.STRENGTH;
+    public StatType stat = StatType.NONE;
     public OddsToStat(float _initialValue, StatType _stat)
     {
         initialValue = _initialValue;

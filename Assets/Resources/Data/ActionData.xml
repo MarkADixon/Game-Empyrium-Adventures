@@ -2,89 +2,110 @@
   <Action>
     <ActionName>Hit</ActionName>
     <DisplayName>Hit</DisplayName>
-    <APmultiplier>1.0</APmultiplier>
+    <Description>A standard physical Attack</Description>
+    <ActionGuageUsed>1.0</ActionGuageUsed>
     <Component_0>
       <TargetType>ENEMY_SINGLE_MELEE</TargetType>
-      <AttackType>PHYSICAL</AttackType>    
+      <HitType>PHYSICAL</HitType>
       <ElementalType>NONE</ElementalType>
-      <DamageType>HP</DamageType>
-      <EffectType>NONE</EffectType>
-      <EffectDuration>0</EffectDuration>
-      <BaseDamageMultiplier>0.8</BaseDamageMultiplier>
-      <BaseChanceToHit>0.75</BaseChanceToHit>
-      <PrimaryPowerStat>STRENGTH</PrimaryPowerStat>
+      <EffectType>DAMAGE_HP</EffectType>
+      <BasePower>0.8</BasePower>
+      <BaseToHit>0.75</BaseToHit>
+      <Duration>0</Duration>
+      <PowerStats>ATTACK</PowerStats>
       <PrimaryPowerStatWeight>1.0</PrimaryPowerStatWeight>
-      <SecondaryPowerStat>AGILITY</SecondaryPowerStat>
-      <SecondaryPowerStatWeight>0.0</SecondaryPowerStatWeight>
-      <PrimaryDefenseStat>TOUGHNESS</PrimaryDefenseStat>
+      <DefenseStats>DEFENSE</DefenseStats>
       <PrimaryDefenseStatWeight>1.0</PrimaryDefenseStatWeight>
-      <SecondaryDefenseStat>AGILITY</SecondaryDefenseStat>
-      <SecondaryDefenseStatWeight>0.0</SecondaryDefenseStatWeight>
     </Component_0>
   </Action>
   <Action>
     <ActionName>Smash</ActionName>
     <DisplayName>Smash</DisplayName>
-    <APmultiplier>1.25</APmultiplier>
+    <Description>Physical attack that hits hard and interrupts the target's action (setting AP to zero). Exhausts and damages the user.</Description>
+    <ActionGuageUsed>1.25</ActionGuageUsed>
     <Component_0>
       <TargetType>SELECTED_ENEMY</TargetType>
-      <AttackType>PHYSICAL</AttackType>
+      <HitType>PHYSICAL</HitType>
       <ElementalType>NONE</ElementalType>
-      <DamageType>HP</DamageType>
-      <EffectType>NONE</EffectType>
-      <EffectDuration>0</EffectDuration>
-      <BaseDamageMultiplier>1.4</BaseDamageMultiplier>
-      <BaseChanceToHit>0.8</BaseChanceToHit>
-      <PrimaryPowerStat>STRENGTH</PrimaryPowerStat>
-      <PrimaryPowerStatWeight>0.5</PrimaryPowerStatWeight>
-      <SecondaryPowerStat>TOUGHNESS</SecondaryPowerStat>
-      <SecondaryPowerStatWeight>0.5</SecondaryPowerStatWeight>
-      <PrimaryDefenseStat>TOUGHNESS</PrimaryDefenseStat>
+      <EffectType>DAMAGE_HP</EffectType>
+      <BasePower>1.4</BasePower>
+      <BaseToHit>0.8</BaseToHit>
+      <Duration>0</Duration>
+      <PowerStats>ATTACK,DEFENSE</PowerStats>
+      <PrimaryPowerStatWeight>0.6</PrimaryPowerStatWeight>
+      <DefenseStats>DEFENSE</DefenseStats>
       <PrimaryDefenseStatWeight>1.0</PrimaryDefenseStatWeight>
-      <SecondaryDefenseStat>TOUGHNESS</SecondaryDefenseStat>
-      <SecondaryDefenseStatWeight>0.0</SecondaryDefenseStatWeight>
     </Component_0>
     <Component_1>
-      <TargetType>AS_PREVIOUS_IF_HIT</TargetType>
-      <AttackType>PHYSICAL</AttackType>
+      <TargetType>SAME_IFHIT</TargetType>
+      <HitType>PHYSICAL</HitType>
       <ElementalType>NONE</ElementalType>
-      <DamageType>EFFECT</DamageType>
       <EffectType>INTERRUPT</EffectType>
-      <EffectDuration>0</EffectDuration>
-      <BaseDamageMultiplier>1.0</BaseDamageMultiplier>
-      <BaseChanceToHit>1.0</BaseChanceToHit>
-      <PrimaryPowerStat>STRENGTH</PrimaryPowerStat>
+      <BasePower>1.0</BasePower>
+      <BaseToHit>1.0</BaseToHit>
+      <Duration>0</Duration>
+      <PowerStats>ATTACK</PowerStats>
       <PrimaryPowerStatWeight>1.0</PrimaryPowerStatWeight>
-      <SecondaryPowerStat>TOUGHNESS</SecondaryPowerStat>
-      <SecondaryPowerStatWeight>0</SecondaryPowerStatWeight>
-      <PrimaryDefenseStat>TOUGHNESS</PrimaryDefenseStat>
+      <DefenseStats>DEFENSE</DefenseStats>
       <PrimaryDefenseStatWeight>1.0</PrimaryDefenseStatWeight>
-      <SecondaryDefenseStat>TOUGHNESS</SecondaryDefenseStat>
-      <SecondaryDefenseStatWeight>0</SecondaryDefenseStatWeight>
     </Component_1>
+    <Component_2>
+      <TargetType>SELF_IFHIT</TargetType>
+      <HitType>PHYSICAL</HitType>
+      <ElementalType>NONE</ElementalType>
+      <EffectType>DAMAGE_HP</EffectType>
+      <BasePower>0.35</BasePower>
+      <BaseToHit>1.0</BaseToHit>
+      <Duration>0</Duration>
+      <PowerStats>ATTACK,DEFENSE</PowerStats>
+      <PrimaryPowerStatWeight>0.6</PrimaryPowerStatWeight>
+      <DefenseStats>DEFENSE</DefenseStats>
+      <PrimaryDefenseStatWeight>1.0</PrimaryDefenseStatWeight>
+    </Component_2>
   </Action>
   <Action>
     <ActionName>Rally</ActionName>
     <DisplayName>Rally</DisplayName>
-    <APmultiplier>0.5</APmultiplier>
+    <Description>Targets another ally, restoring some morale and adding a physical damage buff. Also restores some morale to the user.</Description>
+    <ActionGuageUsed>0.5</ActionGuageUsed>
     <Component_0>
-      <TargetType>SELECTED_ALLY</TargetType>
-      <AttackType>PHYSICAL</AttackType>
+      <TargetType>SELECTED_OTHER_ALLY</TargetType>
+      <HitType>NONE</HitType>
       <ElementalType>NONE</ElementalType>
-      <DamageType>MORALE</DamageType>
-      <EffectType>NONE</EffectType>
-      <EffectDuration>0</EffectDuration>
-      <BaseDamageMultiplier>1.0</BaseDamageMultiplier>
-      <BaseChanceToHit>1.0</BaseChanceToHit>
-      <PrimaryPowerStat>CHARISMA</PrimaryPowerStat>
+      <EffectType>AMPLIFY_PHYSICAL</EffectType>
+      <BasePower>50</BasePower>
+      <BaseToHit>1.0</BaseToHit>
+      <Duration>3</Duration>
+      <PowerStats>ATTACK</PowerStats>
       <PrimaryPowerStatWeight>1.0</PrimaryPowerStatWeight>
-      <SecondaryPowerStat>TOUGHNESS</SecondaryPowerStat>
-      <SecondaryPowerStatWeight>0.0</SecondaryPowerStatWeight>
-      <PrimaryDefenseStat>RESOLVE</PrimaryDefenseStat>
+      <DefenseStats>DEFENSE</DefenseStats>
       <PrimaryDefenseStatWeight>1.0</PrimaryDefenseStatWeight>
-      <SecondaryDefenseStat>TOUGHNESS</SecondaryDefenseStat>
-      <SecondaryDefenseStatWeight>0.0</SecondaryDefenseStatWeight>
     </Component_0>
+    <Component_1>
+      <TargetType>SAME</TargetType>
+      <HitType>NONE</HitType>
+      <ElementalType>NONE</ElementalType>
+      <EffectType>ADD_MP</EffectType>
+      <BasePower>40</BasePower>
+      <BaseToHit>1.0</BaseToHit>
+      <Duration>0</Duration>
+      <PowerStats>CHARISMA</PowerStats>
+      <PrimaryPowerStatWeight>1.0</PrimaryPowerStatWeight>
+      <DefenseStats>RESOLVE</DefenseStats>
+      <PrimaryDefenseStatWeight>1.0</PrimaryDefenseStatWeight>
+    </Component_1>
+    <Component_2>
+      <TargetType>SELF</TargetType>
+      <HitType>NONE</HitType>
+      <ElementalType>NONE</ElementalType>
+      <EffectType>ADD_MP</EffectType>
+      <BasePower>10</BasePower>
+      <BaseToHit>1.0</BaseToHit>
+      <Duration>0</Duration>
+      <PowerStats>CHARISMA</PowerStats>
+      <PrimaryPowerStatWeight>1.0</PrimaryPowerStatWeight>
+      <DefenseStats>RESOLVE</DefenseStats>
+      <PrimaryDefenseStatWeight>1.0</PrimaryDefenseStatWeight>
+    </Component_2>
   </Action>
-  
 </ActionData>

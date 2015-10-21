@@ -32,9 +32,13 @@ public class CharacterSheet
     public List<Action> actions_FrontRow;
     public List<Action> actions_BackRow;
     public List<Action> actions_Activated;
-    //public Ability Active;
-    //public Ability Passive;
+
     //public List<Action> knownActions = new List<Action>();
+
+    public List<Effect> effects;
+
+
+
 }
 
 
@@ -44,7 +48,7 @@ public class CharacterSheet
 public class CharacterStats
 {
     public int hitPoints;
-    public int strength, toughness, agility;
+    public int attack, defense, agility;
     public int magic, spirit, mind;
     public int charisma, resolve;
     public int speed,luck;
@@ -53,8 +57,8 @@ public class CharacterStats
     public CharacterStats()
     {
         hitPoints = 0;
-        strength = 1;
-        toughness = 1;
+        attack = 1;
+        defense = 1;
         agility = 1;
         magic = 1;
         spirit = 1;

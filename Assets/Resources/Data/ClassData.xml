@@ -2,16 +2,16 @@
   <CharacterClass>
     <Name>Junker</Name>
     <SizeType>NORMAL</SizeType>
-    <ForwardAction>Hit</ForwardAction>
-    <RearAction>Hit</RearAction>
-    <ActivatedAction_1>Smash</ActivatedAction_1>
-    <ActivatedAction_2>Rally</ActivatedAction_2>
+    <ForwardAction_0>Hit</ForwardAction_0>
+    <RearAction_0>Hit</RearAction_0>
+    <ActivatedAction_0>Smash</ActivatedAction_0>
+    <ActivatedAction_1>Rally</ActivatedAction_1>
     <LeaderBonus>None</LeaderBonus>
-    <InnateBonus>None</InnateBonus>
+    <InnateBonus_0>None</InnateBonus_0>
     <Alignment>0</Alignment>
     <StatOnLevelUpOdds>
-      <STR>3</STR>
-      <TGH>3</TGH>
+      <ATK>3</ATK>
+      <DEF>3</DEF>
       <AGI>3</AGI>
       <MAG>2</MAG>
       <SPI>3</SPI>

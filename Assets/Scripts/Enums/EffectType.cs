@@ -4,54 +4,71 @@
 //list of all the effects of actions, including buffs/debuffs that have duration
 public enum EffectType
 {
-    DAMAGE, //remove health (HP)
-    HEAL, //add health (HP)
-    DOT, //remove health (HP) each tick
-    REGEN, //add health (HP) each tick
-    INJURED, //decrease health (HP) gains by %
-    VITALITY, //increase health (HP) gains by %
+    DAMAGE_HP, //remove health (HP)
+    ADD_HP, //add health (HP) (ex: heal)
+    DOT_HP, //remove health (HP) each tick
+    REGEN_HP, //add health (HP) each tick
+    DAMPEN_HP, //decrease health (HP) gains by %
+    AMPLIFY_HP, //increase health (HP) gains by %
     INVULNERABLE_HEALTH, //decrease health (HP) loss by %
     VULNERABLE_HEALTH, //increase health (HP) loss by %
     FELL, //target health (HP) to 0 
     FALLEN, //while health (HP) is 0
 
-    DEMORALIZE, //remove morale (MP)
-    INSPIRE, //add morale (MP)
-    , //remove morale (MP) each tick
-    , //add morale (MP) each tick
-    , //decrease morale (MP) gains by %
-    , //increase morale (MP) gains by %
+    DAMAGE_MP, //remove morale (MP) (ex: Demoralize)
+    ADD_MP, //add morale (MP) (ex: inspire)
+    DOT_MP, //remove morale (MP) each tick
+    REGEN_MP, //add morale (MP) each tick
+    DAMPEN_MP, //decrease morale (MP) gains by %
+    AMPLIFY_MP, //increase morale (MP) gains by %
     INVULNERABLE_MORALE, //decrease morale (MP) loss by %
     VULNERABLE_MORALE, //increase morale (MP) loss by %
     BREAK, //target morale (MP) to 0
     INSPIRED, //while morale (MP) is above 100
     DEMORALIZED, //while morale (MP) is below 0
 
-    HINDER, //remove action (AP)
-    ASSIST, //add action (AP)
-    MIRE, //remove action (AP) each tick
-    DRIVE, //add action (AP) each tick
-    SLOW, //decrease action (AP) gains by %
-    HASTE, //increase action (AP) gains by %
-    INTERRUPT, //target AP to 0
+    DAMAGE_AP, //remove action (AP) (ex:Hinder)
+    ADD_AP, //add action (AP) (ex: assist)
+    DOT_AP, //remove action (AP) each tick (ex: mire)
+    REGEN_AP, //add action (AP) each tick (ex:drive)
+    DAMPEN_AP, //decrease action (AP) gains by % (ex: slow)
+    AMPLIFY_AP, //increase action (AP) gains by % (ex: haste)
+    INTERRUPT, //target AP to 0 (ex:interrupt)
     EXHAUSTED, //while action (AP) is below 0
 
-    INVULNERABLE_PHYSICAL, //decrease potency of physical effects by %
-    VULNERABLE_PHYSICAL, //increase potency of physical effects by %
-    INVULNERABLE_MAGICAL, //decrease potency of magical effects by %
-    VULNERABLE_MAGICAL, //increase potency of magical effects by %
-    INVULNERABLE_FIRE, //decrease potency of fire elemental effects by %
-    VULNERABLE_FIRE, //increase potency of fire elemental effects by %
-    INVULNERABLE_WATER, //decrease potency of water elemental effects by %
-    VULNERABLE_WATER, //increase potency of water elemental effects by %
-    INVULNERABLE_EARTH, //decrease potency of earth elemental effects by %
-    VULNERABLE_EARTH, //increase potency of earth elemental effects by %
-    INVULNERABLE_AIR, //decrease potency of air elemental effects by %
-    VULNERABLE_AIR, //increase potency of air elemental effects by %
-    INVULNERABLE_LIGHT, //decrease potency of light elemental effects by %
-    VULNERABLE_LIGHT, //increase potency of light elemental effects by %
-    INVULNERABLE_SHADOW, //decrease potency of shadow elemental effects by %
-    VULNERABLE_SHADOW, //increase potency of shadow elemental effects by %
+    INVULNERABLE_PHYSICAL, //decrease physical effects by % when targeted
+    VULNERABLE_PHYSICAL, //increase physical effects by % when targeted
+    INVULNERABLE_MAGICAL, //decrease magical effects by % when targeted
+    VULNERABLE_MAGICAL, //increase magical effects by % when targeted
+    INVULNERABLE_FIRE, //decrease fire elemental effects by % when targeted
+    VULNERABLE_FIRE, //increase fire elemental effects by % when targeted
+    INVULNERABLE_WATER, //decrease water elemental effects by % when targeted
+    VULNERABLE_WATER, //increase water elemental effects by % when targeted
+    INVULNERABLE_EARTH, //decrease earth elemental effects by % when targeted
+    VULNERABLE_EARTH, //increase earth elemental effects by % when targeted
+    INVULNERABLE_AIR, //decrease air elemental effects by % when targeted
+    VULNERABLE_AIR, //increase air elemental effects by % when targeted
+    INVULNERABLE_LIGHT, //decrease light elemental effects by % when targeted
+    VULNERABLE_LIGHT, //increase light elemental effects by % when targeted
+    INVULNERABLE_SHADOW, //decrease shadow elemental effects by % when targeted
+    VULNERABLE_SHADOW, //increase shadow elemental effects by % when targeted
+
+    DAMPEN_PHYSICAL, //decrease physical effects by % when acting
+    AMPLIFY_PHYSICAL, //increase physical effects by % when acting
+    DAMPEN_MAGICAL, //decrease magical effects by % when acting
+    AMPLIFY_MAGICAL, //increase magical effects by % when acting
+    DAMPEN_FIRE, //decrease fire elemental effects by % when acting
+    AMPLIFY_FIRE, //increase fire elemental effects by % when acting
+    DAMPEN_WATER, //decrease water elemental effects by % when acting
+    AMPLIFY_WATER, //increase water elemental effects by % when acting
+    DAMPEN_EARTH, //decrease earth elemental effects by % when acting
+    AMPLIFY_EARTH, //increase earth elemental effects by % when acting
+    DAMPEN_AIR, //decrease air elemental effects by % when acting
+    AMPLIFY_AIR, //increase air elemental effects by % when acting
+    DAMPEN_LIGHT, //decrease light elemental effects by % when acting
+    AMPLIFY_LIGHT, //increase light elemental effects by % when acting
+    DAMPEN_SHADOW, //decrease shadow elemental effects by % when acting
+    AMPLIFY_SHADOW, //increase shadow elemental effects by % when acting
 
     INCREASE_STRENGTH, //increase STRENGTH attribute
     DECREASE_STRENGTH, //decrease STRENGTH attribute

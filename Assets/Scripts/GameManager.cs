@@ -6,11 +6,11 @@ using System.Collections.Generic; //for lists
 public class GameManager : MonoBehaviour
 {
 
-    public static GameManager instance = null;
+    public static GameManager GM = null;
     // Use this for initialization
     void Awake()
     {
-        if (instance == null) instance = this;
+        if (GM == null) GM = this;
         else Destroy(gameObject);
 
         DontDestroyOnLoad(gameObject);
@@ -59,7 +59,10 @@ public class GameManager : MonoBehaviour
         sheet.stats = new CharacterStats();
         sheet.level = 1- GameSettings.LevelOneStartingStats_NumberOfLevelsFromZeros;
         sheet.elementalType = (ElementalType)Random.Range(1, 5);
-
+        sheet.characterClass = "Junker";
+        sheet.actions_FrontRow = DataManager.DM.characterClassDictionary[sheet.characterClass].forwardActions;
+        sheet.actions_BackRow = DataManager.DM.characterClassDictionary[sheet.characterClass].rearActions;
+        sheet.actions_Activated = DataManager.DM.characterClassDictionary[sheet.characterClass].activatedActions;
         for (int i =0; i< GameSettings.LevelOneStartingStats_NumberOfLevelsFromZeros + level - 1; i++)
         {
             LevelUp(sheet);
@@ -80,14 +83,14 @@ public class GameManager : MonoBehaviour
                 {
                     switch(row.stat)
                     {
-                        case StatType.STRENGTH:
+                        case StatType.ATTACK:
                             {
-                                sheet.stats.strength += 1;
+                                sheet.stats.attack += 1;
                                 break;
                             }
-                        case StatType.TOUGHNESS:
+                        case StatType.DEFENSE:
                             {
-                                sheet.stats.toughness += 1;
+                                sheet.stats.defense += 1;
                                 sheet.stats.hitPoints += 1;
                                 break;
                             }
