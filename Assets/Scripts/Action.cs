@@ -18,9 +18,6 @@ public class Action
     public float timeActionEnds;
     public bool isActionFinished;
 
-    public Character selectedTarget;
-
-
     public Action(Dictionary<string, string> actionData, List<Dictionary<string, string>> componentData)
     {
         /*

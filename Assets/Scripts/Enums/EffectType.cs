@@ -33,6 +33,8 @@ public enum EffectType
     REGEN_AP, //add action (AP) each tick (ex:drive)
     DAMPEN_AP, //decrease action (AP) gains by % (ex: slow)
     AMPLIFY_AP, //increase action (AP) gains by % (ex: haste)
+    INVULNERABLE_ACTION, //decrease action (AP) loss by %
+    VULNERABLE_ACTION, //increase action (AP) loss by %
     INTERRUPT, //target AP to 0 (ex:interrupt)
     EXHAUSTED, //while action (AP) is below 0
 
@@ -70,25 +72,15 @@ public enum EffectType
     DAMPEN_SHADOW, //decrease shadow elemental effects by % when acting
     AMPLIFY_SHADOW, //increase shadow elemental effects by % when acting
 
-    INCREASE_STRENGTH, //increase STRENGTH attribute
-    DECREASE_STRENGTH, //decrease STRENGTH attribute
-    INCREASE_TOUGHNESS, //increase TOUGHNESS attribute
-    DECREASE_TOUGHNESS, //decrease TOUGHNESS attribute
-    INCREASE_AGILITY, //increase AGILITY attribute
-    DECREASE_AGILITY, //decrease AGILITY attribute
-    INCREASE_MAGIC, //increase MAGIC attribute
-    DECREASE_MAGIC, //decrease MAGIC attribute
-    INCREASE_SPIRIT, //increase SPIRIT attribute
-    DECREASE_SPIRIT, //decrease SPIRIT attribute
-    INCREASE_MIND, //increase MIND attribute
-    DECREASE_MIND, //decrease MIND attribute
-    INCREASE_CHARISMA, //increase CHARISMA attribute
-    DECREASE_CHARISMA, //decrease CHARISMA attribute
-    INCREASE_RESOLVE, //increase RESOLVE attribute
-    DECREASE_RESOLVE, //decrease RESOLVE attribute
-    INCREASE_SPEED, //increase SPEED attribute
-    DECREASE_SPEED, //decrease SPEED attribute
-    INCREASE_LUCK, //increase LUCK attribute
-    DECREASE_LUCK, //decrease LUCK attribute
+    MODIFY_MAXHP,
+    MODIFY_ATTACK, 
+    MODIFY_DEFENSE, 
+    MODIFY_AGILITY,
+    MODIFY_SPIRIT, 
+    MODIFY_MIND,
+    MODIFY_CHARISMA, 
+    MODIFY_RESOLVE, 
+    MODIFY_SPEED,
+    MODIFY_LUCK, 
 }
 

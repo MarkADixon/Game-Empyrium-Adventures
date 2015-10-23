@@ -11,7 +11,21 @@ public class CharacterPiece : MonoBehaviour
     public int init = 0;
     public bool isClicked = false;
 
-    public GameObject damageNumber;
+
+    CharacterSheet sheet;
+
+    GameObject characterDisplay,allyDisplay,enemyDisplay;
+    UnityEngine.UI.Text characterName_Text;
+    UnityEngine.UI.Text health_Text;
+    UnityEngine.UI.Image characterHead_Image;
+    UnityEngine.UI.Image squadLocation_Image;
+    UnityEngine.UI.Button activatedAbility1_Button;
+    UnityEngine.UI.Button activatedAbility2_Button;
+    UnityEngine.UI.Text aa1_ButtonText;
+    UnityEngine.UI.Text aa2_ButtonText;
+
+
+    public GameObject damageNumber,allyCharacterUI,enemyCharacterUI;
 
     Animator anim;
 
@@ -19,47 +33,77 @@ public class CharacterPiece : MonoBehaviour
     {
         anim = GetComponent<Animator>();
         
+
+
     }
+
+    public void Initialize(CharacterSheet _sheet, int index)
+    {
+        sheet = _sheet;
+        RectTransform trans;
+        int squadindex;
+        if(sheet.isPlayer)
+        {
+            allyDisplay = GameObject.Find("AllyDisplay");
+            characterDisplay = (GameObject)Instantiate(allyCharacterUI);
+            characterDisplay.transform.SetParent(allyDisplay.transform);
+            trans = characterDisplay.GetComponent<RectTransform>();
+            trans.anchorMin = Vector2.one;
+            trans.anchorMax = Vector2.one;
+            characterDisplay.transform.localPosition = new Vector3(110, -20 - (index*40f));
+            squadindex = sheet.squadLocX + (sheet.squadLocY * 5);
+        }
+        else
+        {
+            enemyDisplay = GameObject.Find("EnemyDisplay");
+            characterDisplay = (GameObject)Instantiate(enemyCharacterUI);
+            characterDisplay.transform.SetParent(enemyDisplay.transform);
+            trans = characterDisplay.GetComponent<RectTransform>();
+            trans.anchorMin = new Vector2(0,1f);
+            trans.anchorMax = new Vector2(0,1f);
+            characterDisplay.transform.localPosition = new Vector3(130, -20 - (index * 40f));
+            squadindex = (4- sheet.squadLocX) + (sheet.squadLocY * 5);
+        }
+
+        foreach(Transform child in trans)
+        {
+            if(child.name == "CharacterNameText")
+            {
+                characterName_Text = child.gameObject.GetComponent<UnityEngine.UI.Text>();
+            }
+            else if(child.name == "HealthText")
+            {
+                health_Text = child.gameObject.GetComponent<UnityEngine.UI.Text>();
+            }
+            else if(child.name == "CharacterHeadImage")
+            {
+                characterHead_Image = child.gameObject.GetComponent<UnityEngine.UI.Image>();
+            }
+            else if(child.name == "SquadLocationImage")
+            {
+                squadLocation_Image = child.gameObject.GetComponent<UnityEngine.UI.Image>();
+            }
+        }
+
+        characterName_Text.text = sheet.characterName + " - " + sheet.characterClass;
+        health_Text.text = ("Health: " + sheet.stats.health.ToString() + " / " + sheet.stats.maxHealth.ToString());
+
+        
+        squadLocation_Image.sprite = DataManager.DM.grid_medium[squadindex];
+        characterHead_Image.sprite = DataManager.DM.character_heads[0];
+
+    }
+
+    public void UpdateUI()
+    {
+        health_Text.text = ("Health: " + sheet.stats.health.ToString() + " / " + sheet.stats.maxHealth.ToString());
+    }
+
 
     // Update is called once per frame
     void Update()
     {
-        /*
-        if(isAttackStart)
-        {
-            //if(!isAttackFinish)
-            // {
-            
-            //    isAttackFinish = true;
-            //}
-            gameObject.transform.position += new Vector3(0.04f, 0f, 0f);
-            if((gameObject.transform.position - fixedPosition).magnitude > 0.66f)
-            {
-                isAttackStart = false;
-                isAttackFinish = true;
-            }
-
-        }
-        if(isAttackFinish)
-        {
-            timer += Time.deltaTime;
-            if(timer > 1f)
-            {
-                isAttackFinish = false;
-                isAttackStart = false;
-                timer = 0f;
-            }
-            else
-            {
-                gameObject.transform.position += new Vector3(-0.04f, 0f, 0f);
-                if((gameObject.transform.position - fixedPosition).magnitude <= 0.03f)
-                {
-                    gameObject.transform.position = fixedPosition;
-                    isAttackFinish = false;
-                }
-            }
-        }
-        */
+        
     }
 
 
@@ -78,20 +122,14 @@ public class CharacterPiece : MonoBehaviour
     {
         anim.Play("characterPiece_Idle");
     }
-    public void ShowDamage(int _damage)
+
+    public void ShowNumber(int _damage, Color color)
     {
 
         fixedPosition = gameObject.GetComponent<Transform>().transform.position;
 
 
         int[] digit = new int[4];
-        bool isHeal = false;
-
-        if(_damage < 0)
-        {
-            isHeal = true;
-            _damage *= -1;
-        }
 
         for(int i = 0; i < 4; i++)
         {
@@ -99,49 +137,49 @@ public class CharacterPiece : MonoBehaviour
             _damage = (int)_damage / 10;
         }//end loop
 
-        GameObject damageNumberClone;
+        GameObject numberClone;
         DamageNumber dn;
         if(digit[3]!=0)
         {
-            damageNumberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
-            dn = (DamageNumber)damageNumberClone.GetComponent<DamageNumber>();
-            dn.Create(digit[0], fixedPosition + new Vector3(0.9f, 0f, 0f), isHeal, 0.4f);
-            damageNumberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
-            dn = (DamageNumber)damageNumberClone.GetComponent<DamageNumber>();
-            dn.Create(digit[1], fixedPosition + new Vector3(0.3f, 0f, 0f), isHeal, 0.2f);
-            damageNumberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
-            dn = (DamageNumber)damageNumberClone.GetComponent<DamageNumber>();
-            dn.Create(digit[2], fixedPosition + new Vector3(-0.3f, 0f, 0f), isHeal, 0f);
-            damageNumberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
-            dn = (DamageNumber)damageNumberClone.GetComponent<DamageNumber>();
-            dn.Create(digit[3], fixedPosition + new Vector3(-0.9f, 0f, 0f), isHeal, 0f);
+            numberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
+            dn = (DamageNumber)numberClone.GetComponent<DamageNumber>();
+            dn.Create(digit[0], fixedPosition + new Vector3(0.9f, 0f, 0f), color, 0.4f);
+            numberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
+            dn = (DamageNumber)numberClone.GetComponent<DamageNumber>();
+            dn.Create(digit[1], fixedPosition + new Vector3(0.3f, 0f, 0f), color, 0.2f);
+            numberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
+            dn = (DamageNumber)numberClone.GetComponent<DamageNumber>();
+            dn.Create(digit[2], fixedPosition + new Vector3(-0.3f, 0f, 0f), color, 0f);
+            numberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
+            dn = (DamageNumber)numberClone.GetComponent<DamageNumber>();
+            dn.Create(digit[3], fixedPosition + new Vector3(-0.9f, 0f, 0f), color, 0f);
         }
         if(digit[3] == 0 && digit[2] != 0)
         {
-            damageNumberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
-            dn = (DamageNumber)damageNumberClone.GetComponent<DamageNumber>();
-            dn.Create(digit[0], fixedPosition + new Vector3(0.6f, 0f, 0f), isHeal, 0.4f);
-            damageNumberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
-            dn = (DamageNumber)damageNumberClone.GetComponent<DamageNumber>();
-            dn.Create(digit[1], fixedPosition, isHeal, 0.2f);
-            damageNumberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
-            dn = (DamageNumber)damageNumberClone.GetComponent<DamageNumber>();
-            dn.Create(digit[2], fixedPosition + new Vector3(-0.6f, 0f, 0f), isHeal, 0f);
+            numberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
+            dn = (DamageNumber)numberClone.GetComponent<DamageNumber>();
+            dn.Create(digit[0], fixedPosition + new Vector3(0.6f, 0f, 0f), color, 0.4f);
+            numberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
+            dn = (DamageNumber)numberClone.GetComponent<DamageNumber>();
+            dn.Create(digit[1], fixedPosition, color, 0.2f);
+            numberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
+            dn = (DamageNumber)numberClone.GetComponent<DamageNumber>();
+            dn.Create(digit[2], fixedPosition + new Vector3(-0.6f, 0f, 0f), color, 0f);
         }
         if(digit[3] == 0 && digit[2] == 0 && digit[1] != 0)
         {
-            damageNumberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
-            dn = (DamageNumber)damageNumberClone.GetComponent<DamageNumber>();
-            dn.Create(digit[0], fixedPosition + new Vector3(0.3f, 0f, 0f), isHeal, 0.2f);
-            damageNumberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
-            dn = (DamageNumber)damageNumberClone.GetComponent<DamageNumber>();
-            dn.Create(digit[1], fixedPosition + new Vector3(-0.3f, 0f, 0f), isHeal, 0f);
+            numberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
+            dn = (DamageNumber)numberClone.GetComponent<DamageNumber>();
+            dn.Create(digit[0], fixedPosition + new Vector3(0.3f, 0f, 0f), color, 0.2f);
+            numberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
+            dn = (DamageNumber)numberClone.GetComponent<DamageNumber>();
+            dn.Create(digit[1], fixedPosition + new Vector3(-0.3f, 0f, 0f), color, 0f);
         }
         if(digit[3] == 0 && digit[2] == 0 && digit[1] == 0)
         {
-            damageNumberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
-            dn = (DamageNumber)damageNumberClone.GetComponent<DamageNumber>();
-            dn.Create(digit[0], fixedPosition, isHeal, 0f);
+            numberClone = (GameObject)Instantiate(damageNumber, Vector3.one, Quaternion.identity);
+            dn = (DamageNumber) numberClone.GetComponent<DamageNumber>();
+            dn.Create(digit[0], fixedPosition, color, 0f);
         }
     }
 

@@ -24,21 +24,15 @@ public class CharacterSheet
 
     //attributes
     public CharacterStats stats = new CharacterStats();
-    public CharacterStats statsMax = new CharacterStats();
+    public CharacterStats statsRaw = new CharacterStats();
 
     //combat
-    public float actGuage = 0f;
     public Action action_Next;
     public List<Action> actions_FrontRow;
     public List<Action> actions_BackRow;
     public List<Action> actions_Activated;
 
     //public List<Action> knownActions = new List<Action>();
-
-    public List<Effect> effects;
-
-
-
 }
 
 
@@ -47,16 +41,19 @@ public class CharacterSheet
 [Serializable]
 public class CharacterStats
 {
-    public int hitPoints;
+    public int health, maxHealth;
+    public float morale, action;
     public int attack, defense, agility;
     public int magic, spirit, mind;
     public int charisma, resolve;
     public int speed,luck;
-    //public int move;
-    public float alignment,morale; 
+    public int move;
+    public float alignment; 
     public CharacterStats()
     {
-        hitPoints = 0;
+        health = 1;
+        morale = 100f;
+        action = 100f;
         attack = 1;
         defense = 1;
         agility = 1;
@@ -67,9 +64,8 @@ public class CharacterStats
         resolve = 1;
         speed = 1;
         luck = 1;
-        //move = 1;
+        move = 1;
         alignment = 0;
-        morale = 100f;
     }
 
 

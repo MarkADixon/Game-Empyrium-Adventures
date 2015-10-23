@@ -14,6 +14,11 @@ public class GameManager : MonoBehaviour
         else Destroy(gameObject);
 
         DontDestroyOnLoad(gameObject);
+
+
+
+
+
     }
 
 
@@ -24,6 +29,14 @@ public class GameManager : MonoBehaviour
 
     // Update is called once per frame
     void Update () {
+
+        if(Input.GetKeyDown(KeyCode.KeypadEnter))
+        {
+            DataManager.DM.Load();
+            RollAllCharacters(1);
+            BattleManager.instance.StartNewBattle(DataManager.DM.playerSquads[0], DataManager.DM.enemySquads[0]);
+        }
+
         if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
         if (Input.GetKeyDown(KeyCode.B)) BattleManager.instance.StartNewBattle(DataManager.DM.playerSquads[0], DataManager.DM.enemySquads[0]);
         if(Input.GetKeyDown(KeyCode.S))
@@ -67,12 +80,13 @@ public class GameManager : MonoBehaviour
         {
             LevelUp(sheet);
         }
+        sheet.stats.maxHealth = sheet.stats.health;
     }
 
     public void LevelUp(CharacterSheet sheet)
     {
         sheet.level += 1;
-        sheet.stats.hitPoints += Random.Range(GameSettings.hitPointsMinOnLevelUp, GameSettings.hitPointsMaxOnLevelUp+1);
+        sheet.stats.health += Random.Range(GameSettings.hitPointsMinOnLevelUp, GameSettings.hitPointsMaxOnLevelUp+1);
 
         for(int i = 0; i < GameSettings.statPointsOnLevelUp; i++)
         {
@@ -91,7 +105,7 @@ public class GameManager : MonoBehaviour
                         case StatType.DEFENSE:
                             {
                                 sheet.stats.defense += 1;
-                                sheet.stats.hitPoints += 1;
+                                sheet.stats.health += 1;
                                 break;
                             }
                         case StatType.AGILITY:
@@ -107,7 +121,7 @@ public class GameManager : MonoBehaviour
                         case StatType.SPIRIT:
                             {
                                 sheet.stats.spirit += 1;
-                                sheet.stats.hitPoints += 1;
+                                sheet.stats.health += 1;
                                 break;
                             }
                         case StatType.MIND:
@@ -123,7 +137,7 @@ public class GameManager : MonoBehaviour
                         case StatType.RESOLVE:
                             {
                                 sheet.stats.resolve += 1;
-                                sheet.stats.hitPoints += 1;
+                                sheet.stats.health += 1;
                                 break;
                             }
                         case StatType.SPEED:

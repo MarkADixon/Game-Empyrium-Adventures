@@ -30,6 +30,10 @@ public class DataManager : MonoBehaviour
     GameObject prefabCharacterPiece;
     TextAsset actionDataFile, classDataFile;
 
+    //texture assets
+    public List<Sprite> grid_medium;
+    public List<Sprite> character_heads;
+
 
 
     //manual Initialize Call, called on awake and before load

@@ -16,7 +16,7 @@ public class BattleManager : MonoBehaviour {
     Squad enemySquad;
 
     //for location calculations on screen placement
-    Vector3 playerSquadOffset = new Vector3(3f, -3.75f, 0);
+    Vector3 playerSquadOffset = new Vector3(2.6f, -3.2f, 0);
     Vector3 sizeOffset, spawnLocation;
     float scaleDistBetweenUnits = 0.75f;
 
@@ -101,6 +101,8 @@ public class BattleManager : MonoBehaviour {
             spawnLocation = new Vector3(_squad.members[i].sheet.squadLocX, _squad.members[i].sheet.squadLocY, _squad.members[i].sheet.squadLocY) * scaleDistBetweenUnits;
             _squad.members[i].piece.transform.localPosition = spawnLocation + playerSquadOffset + sizeOffset;
 
+            _squad.members[i].piece.Initialize(_squad.members[i].sheet,i);
+
             //add reference of all units ot battle manager
             unitsInBattle.Add(_squad.members[i]);
         }
@@ -115,7 +117,7 @@ public class BattleManager : MonoBehaviour {
     {
         for(int i = 0; i < unitsInBattle.Count; i++)
         {
-            unitsInBattle[i].sheet.actGuage = Random.Range(0f, 75f);
+            unitsInBattle[i].sheet.stats.action = Random.Range(0f, 75f);
         }
     }
 
@@ -179,8 +181,8 @@ public class BattleManager : MonoBehaviour {
                         {
                             hitUnits.Add(targetUnit);
                             //apply effect
-                            appliedEffect = new Effect(targetUnit,actionComponent,actingUnit);
-                            targetUnit.sheet.effects.Add(appliedEffect);
+                            appliedEffect = new Effect(actionComponent,actingUnit,targetUnit);
+                            appliedEffect.AddEffect();
                         }
                         else
                         {
@@ -189,24 +191,13 @@ public class BattleManager : MonoBehaviour {
                     }
                 }
 
-                TickImmeadiateEffects(); //tick duration 0 effects then remove them
-
                 CalculateActOrder();
                 actingUnit.sheet.action_Next.isTriggerEffect = false;
                 actingUnit.sheet.action_Next.isEffectResolved = true;
             }
             if (actingUnit.sheet.action_Next.isActionFinished)
             {
-                TickDurationEffects(); //tick all effects
-
-                for(int i = actingUnit.sheet.effects.Count -1; i>=0 ; i--) //remove duration from effects on acting unit
-                {
-                    actingUnit.sheet.effects[i].duration -= 1;
-                    if (actingUnit.sheet.effects[i].duration == 0)
-                    {
-                        actingUnit.sheet.effects.RemoveAt(i);
-                    }
-                }
+                UpdateEffects(); //tick all effects
                 isUnitActing = false;
             }
 
@@ -230,7 +221,7 @@ public class BattleManager : MonoBehaviour {
                 }
                 else
                 {
-                    clickedUnit.sheet.action_Next.selectedTarget = unit;
+                    clickedUnit.selectedTarget = unit;
                     unit.piece.isClicked = false;
                     isStateSelectTarget = false;
                 }
@@ -239,50 +230,24 @@ public class BattleManager : MonoBehaviour {
     }
 
 
-    void TickImmeadiateEffects ()
+ 
+    void UpdateEffects ()
     {
         foreach(Character unit in unitsInBattle)
         {
-            for(int i = unit.sheet.effects.Count - 1; i >= 0; i--) 
+            for(int i = unit.effects.Count - 1; i >= 0; i--)
             {
-                if(unit.sheet.effects[i].duration == 0)
+                if(unit == actingUnit) //acting unit tick all effects and reduce duration
                 {
-                    ApplyEffect(unit.sheet.effects[i], unit);
-                    unit.sheet.effects.RemoveAt(i);
+                    unit.effects[i].ActiveTick();
+                }
+                else  //tick effects for all non active units, does not reduce duration
+                {
+                    unit.effects[i].InactiveTick(); 
                 }
             }
         }
     }
-
-    void TickDurationEffects ()
-    {
-        foreach(Character unit in unitsInBattle)
-        {
-            for(int i = unit.sheet.effects.Count - 1; i >= 0; i--)
-            {
-                ApplyEffect(unit.sheet.effects[i], unit);
-            }
-        }
-    }
-
-    void ApplyEffect(Effect effect, Character unit)
-    {
-        switch(effect.effectType)
-        {
-            case EffectType.DAMAGE_HP:
-                {
-                    RollDamage(unit,effect); 
-                    ApplyDamage(unit);
-                    break;
-                }
-            default:
-                {
-                    Debug.Log(effect.effectType.ToString() + "apply effect not coded");
-                    break;
-                }
-        }
-    }
-
 
     void SetNextAction(Character character)
     {
@@ -349,7 +314,7 @@ public class BattleManager : MonoBehaviour {
             case TargetType.SELECTED_OTHER_ALLY:
                 {
                     targetedUnits.Clear();
-                    targetedUnits.Add(actingUnit.sheet.action_Next.selectedTarget);
+                    targetedUnits.Add(actingUnit.selectedTarget);
                     break;
                 }
             case TargetType.SAME_IFHIT:
@@ -585,7 +550,7 @@ public class BattleManager : MonoBehaviour {
         //remove fallen
         for(int i = targetedUnits.Count - 1; i >= 0; i--)
         {
-            if(targetedUnits[i].sheet.stats.hitPoints <= 0)
+            if(targetedUnits[i].sheet.stats.health <= 0)
             {
                 targetedUnits.RemoveAt(i);
             }
@@ -597,7 +562,7 @@ public class BattleManager : MonoBehaviour {
         //remove unfallen
         for(int i = targetedUnits.Count - 1; i >= 0; i--)
         {
-            if(targetedUnits[i].sheet.stats.hitPoints > 0)
+            if(targetedUnits[i].sheet.stats.health > 0)
             {
                 targetedUnits.RemoveAt(i);
             }
@@ -611,14 +576,14 @@ public class BattleManager : MonoBehaviour {
         //get closest
         for(int i = 0; i < targetedUnits.Count; i++)
         {   
-            if(targetedUnits[i].sheet.stats.hitPoints == lowest)
+            if(targetedUnits[i].sheet.stats.health == lowest)
             {
                 selectUnits.Add(targetedUnits[i]);
             }
-            else if(targetedUnits[i].sheet.stats.hitPoints < lowest)
+            else if(targetedUnits[i].sheet.stats.health < lowest)
             {
                 selectUnits.Clear();
-                lowest = targetedUnits[i].sheet.stats.hitPoints;
+                lowest = targetedUnits[i].sheet.stats.health;
                 selectUnits.Add(targetedUnits[i]);
             }
         }
@@ -634,14 +599,14 @@ public class BattleManager : MonoBehaviour {
         //get closest
         for(int i = 0; i < targetedUnits.Count; i++)
         {
-            if(targetedUnits[i].sheet.stats.hitPoints == highest)
+            if(targetedUnits[i].sheet.stats.health == highest)
             {
                 selectUnits.Add(targetedUnits[i]);
             }
-            else if(targetedUnits[i].sheet.stats.hitPoints > highest)
+            else if(targetedUnits[i].sheet.stats.health > highest)
             {
                 selectUnits.Clear();
-                highest = targetedUnits[i].sheet.stats.hitPoints;
+                highest = targetedUnits[i].sheet.stats.health;
                 selectUnits.Add(targetedUnits[i]);
             }
         }
@@ -697,137 +662,6 @@ public class BattleManager : MonoBehaviour {
         return (roll < toHitChance);
     }
 
-
-
-    void RollDamage(Character unit, Effect effect)
-    {
-        damage = GameSettings.phyDamage_baseDamage + (GameSettings.phyDamage_additionalBaseDamagePerLevel*effect.sourceUnit.sheet.level);
-        damage *= Random.Range(1 - GameSettings.phyDamage_variance, 1 + GameSettings.phyDamage_variance);
-        Debug.Log("base damage : " + damage.ToString());
-        damage *= (1 + (GameSettings.phyDamage_AttributeWeight * (effect.powerStat + GameSettings.phyDamage_RangeSpreadConstant) / 100f));
-        damage *= effect.basePower;
-        float elementMultiplier = 1.0f;
-        switch(effect.elementalType)
-        {
-            case (ElementalType.FIRE):
-                {
-                    if(unit.sheet.elementalType == ElementalType.EARTH)
-                        elementMultiplier *= GameSettings.elementalStrengthMultiplier;
-                    else if (unit.sheet.elementalType == ElementalType.WATER)
-                        elementMultiplier /= GameSettings.elementalStrengthMultiplier;
-                    break;
-                }
-            case (ElementalType.EARTH):
-                {
-                    if(unit.sheet.elementalType == ElementalType.AIR)
-                        elementMultiplier *= GameSettings.elementalStrengthMultiplier;
-                    else if(unit.sheet.elementalType == ElementalType.FIRE)
-                        elementMultiplier /= GameSettings.elementalStrengthMultiplier;
-                    break;
-                }
-            case (ElementalType.AIR):
-                {
-                    if(unit.sheet.elementalType == ElementalType.WATER)
-                        elementMultiplier *= GameSettings.elementalStrengthMultiplier;
-                    else if(unit.sheet.elementalType == ElementalType.EARTH)
-                        elementMultiplier /= GameSettings.elementalStrengthMultiplier;
-                    break;
-                }
-            case (ElementalType.WATER):
-                {
-                    if(unit.sheet.elementalType == ElementalType.FIRE)
-                        elementMultiplier *= GameSettings.elementalStrengthMultiplier;
-                    else if(unit.sheet.elementalType == ElementalType.AIR)
-                        elementMultiplier /= GameSettings.elementalStrengthMultiplier;
-                    break;
-                }
-            default:
-                break;
-        }
-        switch(effect.sourceUnit.sheet.elementalType)
-        {
-            case (ElementalType.FIRE):
-                {
-                    if(unit.sheet.elementalType == ElementalType.EARTH)
-                        elementMultiplier *= GameSettings.elementalStrengthMultiplier;
-                    else if(unit.sheet.elementalType == ElementalType.WATER)
-                        elementMultiplier /= GameSettings.elementalStrengthMultiplier;
-                    break;
-                }
-            case (ElementalType.EARTH):
-                {
-                    if(unit.sheet.elementalType == ElementalType.AIR)
-                        elementMultiplier *= GameSettings.elementalStrengthMultiplier;
-                    else if(unit.sheet.elementalType == ElementalType.FIRE)
-                        elementMultiplier /= GameSettings.elementalStrengthMultiplier;
-                    break;
-                }
-            case (ElementalType.AIR):
-                {
-                    if(unit.sheet.elementalType == ElementalType.WATER)
-                        elementMultiplier *= GameSettings.elementalStrengthMultiplier;
-                    else if(unit.sheet.elementalType == ElementalType.EARTH)
-                        elementMultiplier /= GameSettings.elementalStrengthMultiplier;
-                    break;
-                }
-            case (ElementalType.WATER):
-                {
-                    if(unit.sheet.elementalType == ElementalType.FIRE)
-                        elementMultiplier *= GameSettings.elementalStrengthMultiplier;
-                    else if(unit.sheet.elementalType == ElementalType.AIR)
-                        elementMultiplier /= GameSettings.elementalStrengthMultiplier;
-                    break;
-                }
-            default:
-                break;
-        }
-        if(elementMultiplier > 2f)
-            Debug.Log("Elemental Super Strength!");
-        else if(elementMultiplier > 1.2f)
-            Debug.Log("Elemental Strength!");
-        else if(elementMultiplier < 0.8f)
-            Debug.Log("Elemental is Weak!");
-        else if(elementMultiplier < 0.5f)
-            Debug.Log("Elemental Super Weak!");
-        damage = damage * elementMultiplier;
-
-        //temporary critical hit check
-        if (Random.Range(0f,1f)<0.1f)
-        {
-            Debug.Log("Critical Hit!");
-            damage *= 1.5f;
-        }
-
-
-
-        Debug.Log("damage dealt: " +damage.ToString());
-    }
-
-    void ApplyDamage(Character unit)
-    {
-        //vitality reduction
-        damage *= (1f / (1 + (GameSettings.phyDamageResist_AttributeWeight * unit.sheet.stats.defense / 100f)));
-        damage *= (1f / (1 + (GameSettings.phyDamageResist_LevelWeight * unit.sheet.level/ 100f)));
-
-        //temporary critical hit check
-        if(Random.Range(0f, 1f) < 0.1f)
-        {
-            Debug.Log("Critical Defense!");
-            damage /= 1.5f;
-        }
-
-        Debug.Log("damage taken: " + damage.ToString());
-
-        unit.piece.ShowDamage((int)damage);
-        unit.sheet.stats.hitPoints -= (int)damage;
-        if (unit.sheet.stats.hitPoints <= 0)
-        {
-            unit.sheet.stats.hitPoints = 0;
-            unit.piece.GetComponent<SpriteRenderer>().color *= 0.2f;
-        }
-
-    }
-
     //called after any action to update the shown order
     //will figure the next 10 characters to act and store in the unitActOrder list
     //this is for UI module
@@ -840,7 +674,7 @@ public class BattleManager : MonoBehaviour {
         index=0;
         for(int i = 0; i< unitsInBattle.Count; i++ )
         {
-            maxAct = unitsInBattle[i].sheet.actGuage;
+            maxAct = unitsInBattle[i].sheet.stats.action;
             futureActGuage.Add(maxAct);
         }
 
@@ -852,7 +686,7 @@ public class BattleManager : MonoBehaviour {
             for(int i = 0; i < unitsInBattle.Count; i++)
             {                  
                 //conditions: unit hp>0, 
-                if(unitsInBattle[i].sheet.stats.hitPoints > 0)
+                if(unitsInBattle[i].sheet.stats.health > 0)
                 {        
                     futureActGuage[i] += 0.1f *(2.5f * Mathf.Sqrt(unitsInBattle[i].sheet.stats.speed + 25f));
                     isConditionsMet = true;
@@ -905,9 +739,9 @@ public class BattleManager : MonoBehaviour {
         index = 0;
         for(int i = 0; i < unitsInBattle.Count; i++)
         {
-            if(unitsInBattle[i].sheet.actGuage > maxAct)
+            if(unitsInBattle[i].sheet.stats.action > maxAct)
             {
-                maxAct = unitsInBattle[i].sheet.actGuage;
+                maxAct = unitsInBattle[i].sheet.stats.action;
                 index = i;
             }
         }
@@ -917,7 +751,7 @@ public class BattleManager : MonoBehaviour {
         {
             isUnitActing = true;
             actingUnit = unitsInBattle[index];
-            unitsInBattle[index].sheet.actGuage -= unitsInBattle[index].sheet.action_Next.actionGuageUsed*100f;
+            unitsInBattle[index].sheet.stats.action -= unitsInBattle[index].sheet.action_Next.actionGuageUsed*100f;
             unitsInBattle[index].piece.Animate_Attack();
         }
     }
@@ -935,9 +769,9 @@ public class BattleManager : MonoBehaviour {
             for(int i = 0; i < unitsInBattle.Count; i++)
             {
                 //conditions: unit hp>0, 
-                if(unitsInBattle[i].sheet.stats.hitPoints > 0)
+                if(unitsInBattle[i].sheet.stats.health > 0)
                 {
-                    unitsInBattle[i].sheet.actGuage += 0.1f * (2.5f * Mathf.Sqrt(unitsInBattle[i].sheet.stats.speed + 25f));
+                    unitsInBattle[i].sheet.stats.action += 0.1f * (2.5f * Mathf.Sqrt(unitsInBattle[i].sheet.stats.speed + 25f));
                     isConditionsMet = true;
                 }
             }
@@ -953,9 +787,9 @@ public class BattleManager : MonoBehaviour {
             index = 0;
             for(int i = 0; i < unitsInBattle.Count; i++)
             {
-                if(unitsInBattle[i].sheet.actGuage > maxAct)
+                if(unitsInBattle[i].sheet.stats.action > maxAct)
                 {
-                    maxAct = unitsInBattle[i].sheet.actGuage;
+                    maxAct = unitsInBattle[i].sheet.stats.action;
                     index = i;
                 }
             }
@@ -965,7 +799,7 @@ public class BattleManager : MonoBehaviour {
             {
                 isUnitActing = true;
                 actingUnit = unitsInBattle[index];
-                unitsInBattle[index].sheet.actGuage -= unitsInBattle[index].sheet.action_Next.actionGuageUsed*100f;
+                unitsInBattle[index].sheet.stats.action -= unitsInBattle[index].sheet.action_Next.actionGuageUsed*100f;
                 actingUnit.sheet.action_Next.StartAction();
                 actingUnit.piece.Animate_Attack();
             }
