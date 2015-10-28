@@ -609,90 +609,7 @@ public class Effect
         damage *= (1 + (GameSettings.DamageAP_PowerStatWeight * (sourcePowerStat + GameSettings.DamageAP_RangeSpreadConstant) / 100f));
 
         //create and apply elemental damage multiplier
-        float elementMultiplier = 1.0f;
-        switch(elementalType)
-        {
-            case (ElementalType.FIRE):
-                {
-                    if(targetUnit.sheet.elementalType == ElementalType.EARTH)
-                        elementMultiplier *= GameSettings.DamageAP_elementalMultiplier;
-                    else if(targetUnit.sheet.elementalType == ElementalType.WATER)
-                        elementMultiplier /= GameSettings.DamageAP_elementalMultiplier;
-                    break;
-                }
-            case (ElementalType.EARTH):
-                {
-                    if(targetUnit.sheet.elementalType == ElementalType.AIR)
-                        elementMultiplier *= GameSettings.DamageAP_elementalMultiplier;
-                    else if(targetUnit.sheet.elementalType == ElementalType.FIRE)
-                        elementMultiplier /= GameSettings.DamageAP_elementalMultiplier;
-                    break;
-                }
-            case (ElementalType.AIR):
-                {
-                    if(targetUnit.sheet.elementalType == ElementalType.WATER)
-                        elementMultiplier *= GameSettings.DamageAP_elementalMultiplier;
-                    else if(targetUnit.sheet.elementalType == ElementalType.EARTH)
-                        elementMultiplier /= GameSettings.DamageAP_elementalMultiplier;
-                    break;
-                }
-            case (ElementalType.WATER):
-                {
-                    if(targetUnit.sheet.elementalType == ElementalType.FIRE)
-                        elementMultiplier *= GameSettings.DamageAP_elementalMultiplier;
-                    else if(targetUnit.sheet.elementalType == ElementalType.AIR)
-                        elementMultiplier /= GameSettings.DamageAP_elementalMultiplier;
-                    break;
-                }
-            default:
-                break;
-        }
-        switch(sourceUnit.sheet.elementalType)
-        {
-            case (ElementalType.FIRE):
-                {
-                    if(targetUnit.sheet.elementalType == ElementalType.EARTH)
-                        elementMultiplier *= GameSettings.DamageAP_elementalMultiplier;
-                    else if(targetUnit.sheet.elementalType == ElementalType.WATER)
-                        elementMultiplier /= GameSettings.DamageAP_elementalMultiplier;
-                    break;
-                }
-            case (ElementalType.EARTH):
-                {
-                    if(targetUnit.sheet.elementalType == ElementalType.AIR)
-                        elementMultiplier *= GameSettings.DamageAP_elementalMultiplier;
-                    else if(targetUnit.sheet.elementalType == ElementalType.FIRE)
-                        elementMultiplier /= GameSettings.DamageAP_elementalMultiplier;
-                    break;
-                }
-            case (ElementalType.AIR):
-                {
-                    if(targetUnit.sheet.elementalType == ElementalType.WATER)
-                        elementMultiplier *= GameSettings.DamageAP_elementalMultiplier;
-                    else if(targetUnit.sheet.elementalType == ElementalType.EARTH)
-                        elementMultiplier /= GameSettings.DamageAP_elementalMultiplier;
-                    break;
-                }
-            case (ElementalType.WATER):
-                {
-                    if(targetUnit.sheet.elementalType == ElementalType.FIRE)
-                        elementMultiplier *= GameSettings.DamageAP_elementalMultiplier;
-                    else if(targetUnit.sheet.elementalType == ElementalType.AIR)
-                        elementMultiplier /= GameSettings.DamageAP_elementalMultiplier;
-                    break;
-                }
-            default:
-                break;
-        }
-        if(elementMultiplier > 2f)
-            Debug.Log("Elemental Super Strength!");
-        else if(elementMultiplier > 1.2f)
-            Debug.Log("Elemental Strength!");
-        else if(elementMultiplier < 0.8f)
-            Debug.Log("Elemental is Weak!");
-        else if(elementMultiplier < 0.5f)
-            Debug.Log("Elemental Super Weak!");
-        damage = damage * elementMultiplier;
+
 
         //temporary critical hit check
         if(UnityEngine.Random.Range(0f, 1f) < 0.1f)
@@ -724,6 +641,10 @@ public class Effect
 
         //base damage 
         damage = GameSettings.DamageHP_baseDamage + (GameSettings.DamageHP_addBasePerLevel * sourceUnit.sheet.level);
+        if (sourceUnit.sheet.level > 1000)
+        {
+            damage *= sourceUnit.sheet.level / 1000f;
+        }
 
         //damage roll about the base damage point
         damage *= UnityEngine.Random.Range(1f - GameSettings.DamageHP_variance, 1f + GameSettings.DamageHP_variance);
@@ -735,92 +656,6 @@ public class Effect
         //multiply effect base power 
         damage *= basePower;
 
-        //create and apply elemental damage multiplier
-        float elementMultiplier = 1.0f;
-        switch(elementalType)
-        {
-            case (ElementalType.FIRE):
-                {
-                    if(targetUnit.sheet.elementalType == ElementalType.EARTH)
-                        elementMultiplier *= GameSettings.DamageHP_elementalMultiplier;
-                    else if(targetUnit.sheet.elementalType == ElementalType.WATER)
-                        elementMultiplier /= GameSettings.DamageHP_elementalMultiplier;
-                    break;
-                }
-            case (ElementalType.EARTH):
-                {
-                    if(targetUnit.sheet.elementalType == ElementalType.AIR)
-                        elementMultiplier *= GameSettings.DamageHP_elementalMultiplier;
-                    else if(targetUnit.sheet.elementalType == ElementalType.FIRE)
-                        elementMultiplier /= GameSettings.DamageHP_elementalMultiplier;
-                    break;
-                }
-            case (ElementalType.AIR):
-                {
-                    if(targetUnit.sheet.elementalType == ElementalType.WATER)
-                        elementMultiplier *= GameSettings.DamageHP_elementalMultiplier;
-                    else if(targetUnit.sheet.elementalType == ElementalType.EARTH)
-                        elementMultiplier /= GameSettings.DamageHP_elementalMultiplier;
-                    break;
-                }
-            case (ElementalType.WATER):
-                {
-                    if(targetUnit.sheet.elementalType == ElementalType.FIRE)
-                        elementMultiplier *= GameSettings.DamageHP_elementalMultiplier;
-                    else if(targetUnit.sheet.elementalType == ElementalType.AIR)
-                        elementMultiplier /= GameSettings.DamageHP_elementalMultiplier;
-                    break;
-                }
-            default:
-                break;
-        }
-        switch(sourceUnit.sheet.elementalType)
-        {
-            case (ElementalType.FIRE):
-                {
-                    if(targetUnit.sheet.elementalType == ElementalType.EARTH)
-                        elementMultiplier *= GameSettings.DamageHP_elementalMultiplier;
-                    else if(targetUnit.sheet.elementalType == ElementalType.WATER)
-                        elementMultiplier /= GameSettings.DamageHP_elementalMultiplier;
-                    break;
-                }
-            case (ElementalType.EARTH):
-                {
-                    if(targetUnit.sheet.elementalType == ElementalType.AIR)
-                        elementMultiplier *= GameSettings.DamageHP_elementalMultiplier;
-                    else if(targetUnit.sheet.elementalType == ElementalType.FIRE)
-                        elementMultiplier /= GameSettings.DamageHP_elementalMultiplier;
-                    break;
-                }
-            case (ElementalType.AIR):
-                {
-                    if(targetUnit.sheet.elementalType == ElementalType.WATER)
-                        elementMultiplier *= GameSettings.DamageHP_elementalMultiplier;
-                    else if(targetUnit.sheet.elementalType == ElementalType.EARTH)
-                        elementMultiplier /= GameSettings.DamageHP_elementalMultiplier;
-                    break;
-                }
-            case (ElementalType.WATER):
-                {
-                    if(targetUnit.sheet.elementalType == ElementalType.FIRE)
-                        elementMultiplier *= GameSettings.DamageHP_elementalMultiplier;
-                    else if(targetUnit.sheet.elementalType == ElementalType.AIR)
-                        elementMultiplier /= GameSettings.DamageHP_elementalMultiplier;
-                    break;
-                }
-            default:
-                break;
-        }
-        if(elementMultiplier > 2f)
-            Debug.Log("Elemental Super Strength!");
-        else if(elementMultiplier > 1.2f)
-            Debug.Log("Elemental Strength!");
-        else if(elementMultiplier < 0.8f)
-            Debug.Log("Elemental is Weak!");
-        else if(elementMultiplier < 0.5f)
-            Debug.Log("Elemental Super Weak!");
-        damage = damage * elementMultiplier;
-
         //temporary critical hit check
         if(UnityEngine.Random.Range(0f, 1f) < 0.1f)
         {
@@ -831,7 +666,7 @@ public class Effect
         Debug.Log("total damage dealt: " + damage.ToString());
 
         //resist reduction
-        damage *= (1f / (1 + (GameSettings.DamageHP_ResistStatWeight* GetStatResist(targetUnit) / 100f)));
+        damage *= (1f / (1 + (GameSettings.DamageHP_ResistStatWeight * GetStatResist(targetUnit) / 100f)));
         damage *= (1f / (1 + (GameSettings.DamageHP_ResistLevelWeight * targetUnit.sheet.level / 100f)));
 
         //temporary anticritical defense check
@@ -841,13 +676,66 @@ public class Effect
             damage /= 1.5f;
         }
 
-        Debug.Log("damage taken: " + damage.ToString());
+        float shieldDamage =0f, armorDamage=0f, healthDamage = 0f;
+        float shieldLeft=0f, armorLeft = 0f;
 
-        targetUnit.piece.ShowNumber((int)damage,GameSettings.DamageHP_color);
-        targetUnit.sheet.stats.health -= (int)damage;
+        shieldLeft = targetUnit.sheet.stats.shield / targetUnit.sheet.stats.maxShield;
+        armorLeft = targetUnit.sheet.stats.armor / targetUnit.sheet.stats.maxArmor;
+
+        if(damage > 0)
+        {
+            if(shieldLeft > 0f)
+            {
+                shieldDamage = damage * shieldLeft;
+            }
+            else
+            {
+                shieldDamage = 0f;
+            }
+            damage = damage - shieldDamage;
+        }
+
+        if(damage > 0)
+        {
+            if(armorLeft > 0f)
+            {
+                armorDamage = damage * armorLeft;
+            }
+            else
+            {
+                armorDamage = 0f;
+            }
+            damage = damage - armorDamage;
+
+            armorDamage *= 0.33f;
+        }
+
+        if(damage > 0)
+        {
+            healthDamage = damage;
+        }
+
+        //create and apply elemental damage multiplier
+        switch(elementalType)
+        {
+            default:
+                break;
+        }
+
+
+
+        Debug.Log("damage taken HP: " + healthDamage.ToString() + "  Armor: " + armorDamage.ToString() + "  Shield: "+ shieldDamage.ToString());
+
+        targetUnit.piece.ShowNumber((int)(healthDamage+armorDamage+shieldDamage),GameSettings.DamageHP_color);
+
+        targetUnit.sheet.stats.health -= (int)healthDamage;
+        targetUnit.sheet.stats.armor -= (int)armorDamage;
+        targetUnit.sheet.stats.shield -= (int)shieldDamage;
+
         if(targetUnit.sheet.stats.health <= 0)
         {
             targetUnit.sheet.stats.health = 0;
+            targetUnit.sheet.stats.shield = 0;
             targetUnit.piece.GetComponent<SpriteRenderer>().color *= 0.2f;
         }
     }
@@ -866,91 +754,7 @@ public class Effect
         damage *= (1 + (GameSettings.DamageMP_PowerStatWeight * (sourcePowerStat + GameSettings.DamageMP_RangeSpreadConstant) / 100f));
 
         //create and apply elemental damage multiplier
-        float elementMultiplier = 1.0f;
-        switch(elementalType)
-        {
-            case (ElementalType.FIRE):
-                {
-                    if(targetUnit.sheet.elementalType == ElementalType.EARTH)
-                        elementMultiplier *= GameSettings.DamageMP_elementalMultiplier;
-                    else if(targetUnit.sheet.elementalType == ElementalType.WATER)
-                        elementMultiplier /= GameSettings.DamageMP_elementalMultiplier;
-                    break;
-                }
-            case (ElementalType.EARTH):
-                {
-                    if(targetUnit.sheet.elementalType == ElementalType.AIR)
-                        elementMultiplier *= GameSettings.DamageMP_elementalMultiplier;
-                    else if(targetUnit.sheet.elementalType == ElementalType.FIRE)
-                        elementMultiplier /= GameSettings.DamageMP_elementalMultiplier;
-                    break;
-                }
-            case (ElementalType.AIR):
-                {
-                    if(targetUnit.sheet.elementalType == ElementalType.WATER)
-                        elementMultiplier *= GameSettings.DamageMP_elementalMultiplier;
-                    else if(targetUnit.sheet.elementalType == ElementalType.EARTH)
-                        elementMultiplier /= GameSettings.DamageMP_elementalMultiplier;
-                    break;
-                }
-            case (ElementalType.WATER):
-                {
-                    if(targetUnit.sheet.elementalType == ElementalType.FIRE)
-                        elementMultiplier *= GameSettings.DamageMP_elementalMultiplier;
-                    else if(targetUnit.sheet.elementalType == ElementalType.AIR)
-                        elementMultiplier /= GameSettings.DamageMP_elementalMultiplier;
-                    break;
-                }
-            default:
-                break;
-        }
-        switch(sourceUnit.sheet.elementalType)
-        {
-            case (ElementalType.FIRE):
-                {
-                    if(targetUnit.sheet.elementalType == ElementalType.EARTH)
-                        elementMultiplier *= GameSettings.DamageMP_elementalMultiplier;
-                    else if(targetUnit.sheet.elementalType == ElementalType.WATER)
-                        elementMultiplier /= GameSettings.DamageMP_elementalMultiplier;
-                    break;
-                }
-            case (ElementalType.EARTH):
-                {
-                    if(targetUnit.sheet.elementalType == ElementalType.AIR)
-                        elementMultiplier *= GameSettings.DamageMP_elementalMultiplier;
-                    else if(targetUnit.sheet.elementalType == ElementalType.FIRE)
-                        elementMultiplier /= GameSettings.DamageMP_elementalMultiplier;
-                    break;
-                }
-            case (ElementalType.AIR):
-                {
-                    if(targetUnit.sheet.elementalType == ElementalType.WATER)
-                        elementMultiplier *= GameSettings.DamageMP_elementalMultiplier;
-                    else if(targetUnit.sheet.elementalType == ElementalType.EARTH)
-                        elementMultiplier /= GameSettings.DamageMP_elementalMultiplier;
-                    break;
-                }
-            case (ElementalType.WATER):
-                {
-                    if(targetUnit.sheet.elementalType == ElementalType.FIRE)
-                        elementMultiplier *= GameSettings.DamageMP_elementalMultiplier;
-                    else if(targetUnit.sheet.elementalType == ElementalType.AIR)
-                        elementMultiplier /= GameSettings.DamageMP_elementalMultiplier;
-                    break;
-                }
-            default:
-                break;
-        }
-        if(elementMultiplier > 2f)
-            Debug.Log("Elemental Super Strength!");
-        else if(elementMultiplier > 1.2f)
-            Debug.Log("Elemental Strength!");
-        else if(elementMultiplier < 0.8f)
-            Debug.Log("Elemental is Weak!");
-        else if(elementMultiplier < 0.5f)
-            Debug.Log("Elemental Super Weak!");
-        damage = damage * elementMultiplier;
-
+      
         //temporary critical hit check
         if(UnityEngine.Random.Range(0f, 1f) < 0.1f)
         {

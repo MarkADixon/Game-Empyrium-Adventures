@@ -14,7 +14,6 @@ public class CharacterSheet
     public int experience = 0;
 
     public SizeType size = SizeType.NORMAL;
-    public ElementalType elementalType = ElementalType.NONE;
     public bool isElite = false;
     public bool isPlayer = false;
 
@@ -42,6 +41,8 @@ public class CharacterSheet
 public class CharacterStats
 {
     public int health, maxHealth;
+    public float armor, maxArmor;
+    public float shield, maxShield;
     public float morale, action;
     public int attack, defense, agility;
     public int magic, spirit, mind;

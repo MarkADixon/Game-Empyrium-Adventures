@@ -151,7 +151,7 @@ public class DataManager : MonoBehaviour
         //create pieces for each enemy sheet then add characters to enemy army
         for(int i = 0; i < enemySheets.Count; i++)
         {
-            GameObject newPiece = (GameObject)Instantiate(prefabCharacterPiece, Vector3.zero, Quaternion.identity);
+            GameObject newPiece = (GameObject)Instantiate(prefabCharacterPiece);
             Character newCharacter = new Character(enemySheets[i], newPiece.GetComponent<CharacterPiece>());
             enemyArmy.Add(newCharacter);
         }

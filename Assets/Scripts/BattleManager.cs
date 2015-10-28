@@ -100,7 +100,7 @@ public class BattleManager : MonoBehaviour {
             sizeOffset = ((int)_squad.members[i].sheet.size - 1) * Vector3.one * 0.5f * scaleDistBetweenUnits;
             spawnLocation = new Vector3(_squad.members[i].sheet.squadLocX, _squad.members[i].sheet.squadLocY, _squad.members[i].sheet.squadLocY) * scaleDistBetweenUnits;
             _squad.members[i].piece.transform.localPosition = spawnLocation + playerSquadOffset + sizeOffset;
-
+            _squad.members[i].piece.gameObject.SetActive(true);
             _squad.members[i].piece.Initialize(_squad.members[i].sheet,i);
 
             //add reference of all units ot battle manager
@@ -198,6 +198,7 @@ public class BattleManager : MonoBehaviour {
             if (actingUnit.sheet.action_Next.isActionFinished)
             {
                 UpdateEffects(); //tick all effects
+                RegenShields();
                 isUnitActing = false;
             }
 
@@ -248,6 +249,27 @@ public class BattleManager : MonoBehaviour {
             }
         }
     }
+
+    void RegenShields()
+    {
+        foreach(Character unit in unitsInBattle)
+        {
+            if(unit.sheet.stats.health > 0)
+            {
+                if(unit.sheet.stats.shield < unit.sheet.stats.maxShield)
+                {
+                    unit.sheet.stats.shield += (0.025f * unit.sheet.stats.maxShield);
+                }
+                else
+                {
+                    unit.sheet.stats.shield = unit.sheet.stats.maxShield;
+                }
+                unit.piece.UpdateUI();
+            }
+        }
+    }
+
+
 
     void SetNextAction(Character character)
     {

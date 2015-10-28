@@ -15,6 +15,7 @@ public class Character
     public Character (CharacterSheet _sheet, CharacterPiece _piece) {
         sheet = _sheet;
         piece = _piece;
+        piece.transform.localPosition = new Vector3(1000f, 1000f, 1000f);
 	}
 
 }

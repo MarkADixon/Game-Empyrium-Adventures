@@ -16,14 +16,11 @@ public class CharacterPiece : MonoBehaviour
 
     GameObject characterDisplay,allyDisplay,enemyDisplay;
     UnityEngine.UI.Text characterName_Text;
-    UnityEngine.UI.Text health_Text;
     UnityEngine.UI.Image characterHead_Image;
     UnityEngine.UI.Image squadLocation_Image;
-    UnityEngine.UI.Button activatedAbility1_Button;
-    UnityEngine.UI.Button activatedAbility2_Button;
-    UnityEngine.UI.Text aa1_ButtonText;
-    UnityEngine.UI.Text aa2_ButtonText;
-
+    UnityEngine.UI.Image healthFill_Image;
+    UnityEngine.UI.Image armorFill_Image;
+    UnityEngine.UI.Image shieldFill_Image;
 
     public GameObject damageNumber,allyCharacterUI,enemyCharacterUI;
 
@@ -50,7 +47,7 @@ public class CharacterPiece : MonoBehaviour
             trans = characterDisplay.GetComponent<RectTransform>();
             trans.anchorMin = Vector2.one;
             trans.anchorMax = Vector2.one;
-            characterDisplay.transform.localPosition = new Vector3(110, -20 - (index*40f));
+            characterDisplay.transform.localPosition = new Vector3(110, -20 - (index*48f));
             squadindex = sheet.squadLocX + (sheet.squadLocY * 5);
         }
         else
@@ -61,7 +58,7 @@ public class CharacterPiece : MonoBehaviour
             trans = characterDisplay.GetComponent<RectTransform>();
             trans.anchorMin = new Vector2(0,1f);
             trans.anchorMax = new Vector2(0,1f);
-            characterDisplay.transform.localPosition = new Vector3(130, -20 - (index * 40f));
+            characterDisplay.transform.localPosition = new Vector3(130, -20 - (index * 48f));
             squadindex = (4- sheet.squadLocX) + (sheet.squadLocY * 5);
         }
 
@@ -71,9 +68,17 @@ public class CharacterPiece : MonoBehaviour
             {
                 characterName_Text = child.gameObject.GetComponent<UnityEngine.UI.Text>();
             }
-            else if(child.name == "HealthText")
+            else if(child.name == "HealthIconFill")
             {
-                health_Text = child.gameObject.GetComponent<UnityEngine.UI.Text>();
+                healthFill_Image = child.gameObject.GetComponent<UnityEngine.UI.Image>();
+            }
+            else if(child.name == "ArmorIconFill")
+            {
+                armorFill_Image = child.gameObject.GetComponent<UnityEngine.UI.Image>();
+            }
+            else if(child.name == "ShieldIconFill")
+            {
+                shieldFill_Image = child.gameObject.GetComponent<UnityEngine.UI.Image>();
             }
             else if(child.name == "CharacterHeadImage")
             {
@@ -85,18 +90,39 @@ public class CharacterPiece : MonoBehaviour
             }
         }
 
-        characterName_Text.text = sheet.characterName + " - " + sheet.characterClass;
-        health_Text.text = ("Health: " + sheet.stats.health.ToString() + " / " + sheet.stats.maxHealth.ToString());
-
-        
+        characterName_Text.text = sheet.characterName + " - " + sheet.characterClass + " Lvl " + sheet.level;
+       
         squadLocation_Image.sprite = DataManager.DM.grid_medium[squadindex];
         characterHead_Image.sprite = DataManager.DM.character_heads[0];
-
+        UpdateUI();
     }
 
     public void UpdateUI()
     {
-        health_Text.text = ("Health: " + sheet.stats.health.ToString() + " / " + sheet.stats.maxHealth.ToString());
+        if(sheet.stats.maxHealth != 0)
+        {
+            healthFill_Image.fillAmount = (float) sheet.stats.health / (float)sheet.stats.maxHealth;
+        }
+        else
+        {
+            healthFill_Image.fillAmount = 0f;
+        }
+        if(sheet.stats.maxArmor != 0)
+        {
+            armorFill_Image.fillAmount = (float)sheet.stats.armor / (float)sheet.stats.maxArmor;
+        }
+        else
+        {
+            armorFill_Image.fillAmount = 0f;
+        }
+        if(sheet.stats.maxShield != 0)
+        {
+            shieldFill_Image.fillAmount = (float)sheet.stats.shield / (float)sheet.stats.maxShield;
+        }
+        else
+        {
+            shieldFill_Image.fillAmount = 0f;
+        }
     }
 
 

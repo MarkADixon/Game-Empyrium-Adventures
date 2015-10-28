@@ -36,7 +36,7 @@ public static class GameSettings
     public static float DamageHP_baseDamage = 10f;
     public static float DamageHP_addBasePerLevel = 1f;
     public static float DamageHP_variance = 0.20f;
-    public static float DamageHP_PowerStatWeight = 4f;
+    public static float DamageHP_PowerStatWeight = 5f;
     public static float DamageHP_RangeSpreadConstant = 0f; //higher extends the range
     public static float DamageHP_ResistStatWeight = 0.8f; //vitality resist
     public static float DamageHP_ResistLevelWeight = 0.2f;

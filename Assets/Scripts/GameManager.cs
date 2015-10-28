@@ -22,20 +22,17 @@ public class GameManager : MonoBehaviour
     }
 
 
-
+    void Start()
+    {
+        DataManager.DM.Load();
+        RollAllCharacters(1);
+    }
 
     
 
 
     // Update is called once per frame
     void Update () {
-
-        if(Input.GetKeyDown(KeyCode.KeypadEnter))
-        {
-            DataManager.DM.Load();
-            RollAllCharacters(1);
-            BattleManager.instance.StartNewBattle(DataManager.DM.playerSquads[0], DataManager.DM.enemySquads[0]);
-        }
 
         if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
         if (Input.GetKeyDown(KeyCode.B)) BattleManager.instance.StartNewBattle(DataManager.DM.playerSquads[0], DataManager.DM.enemySquads[0]);
@@ -44,8 +41,10 @@ public class GameManager : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.L))
             DataManager.DM.Load();
         if(Input.GetKeyDown(KeyCode.R))
-            RollAllCharacters(1);
-
+        {
+            
+            BattleManager.instance.StartNewBattle(DataManager.DM.playerSquads[0], DataManager.DM.enemySquads[0]);
+        }
     }
 
     public void RollAllCharacters(int level)
@@ -71,7 +70,6 @@ public class GameManager : MonoBehaviour
 
         sheet.stats = new CharacterStats();
         sheet.level = 1- GameSettings.LevelOneStartingStats_NumberOfLevelsFromZeros;
-        sheet.elementalType = (ElementalType)Random.Range(1, 5);
         sheet.characterClass = "Junker";
         sheet.actions_FrontRow = DataManager.DM.characterClassDictionary[sheet.characterClass].forwardActions;
         sheet.actions_BackRow = DataManager.DM.characterClassDictionary[sheet.characterClass].rearActions;
@@ -81,12 +79,16 @@ public class GameManager : MonoBehaviour
             LevelUp(sheet);
         }
         sheet.stats.maxHealth = sheet.stats.health;
+        sheet.stats.maxArmor = sheet.stats.armor;
+        sheet.stats.maxShield = sheet.stats.shield;
     }
 
     public void LevelUp(CharacterSheet sheet)
     {
         sheet.level += 1;
         sheet.stats.health += Random.Range(GameSettings.hitPointsMinOnLevelUp, GameSettings.hitPointsMaxOnLevelUp+1);
+        sheet.stats.armor += Random.Range(1, 6);
+        sheet.stats.shield += Random.Range(1, 6);
 
         for(int i = 0; i < GameSettings.statPointsOnLevelUp; i++)
         {
