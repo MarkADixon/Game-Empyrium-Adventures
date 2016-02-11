@@ -17,8 +17,15 @@ public class SoundManager : MonoBehaviour {
     // Use this for initialization
     void Awake ()
     {
-        if (SM == null) SM = this;
-        else Destroy(gameObject);
+        if(SM == null)
+        {
+            SM = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
 
         DontDestroyOnLoad(gameObject);
 	}

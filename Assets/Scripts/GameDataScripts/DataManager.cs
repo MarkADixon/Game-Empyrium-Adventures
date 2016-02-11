@@ -52,12 +52,19 @@ public class DataManager : MonoBehaviour
     void Awake()
     {
         if(DM == null)
+        {
             DM = this;
+        }
         else
+        {
             Destroy(gameObject);
-
+            return;
+        }
         DontDestroyOnLoad(gameObject);
 
+        //UI initialization
+        //battle_UICanvas = GameObject.Instantiate((GameObject)Resources.Load("UI/BattleUICanvas"));
+          
         //resource initialization
         prefabCharacterPiece = (GameObject)Resources.Load("characterPiece");
 

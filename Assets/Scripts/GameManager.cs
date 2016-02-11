@@ -5,19 +5,34 @@ using System.Collections.Generic; //for lists
 
 public class GameManager : MonoBehaviour
 {
+    public enum GameState
+    { 
+        FadeOut,
+        FadeIn,
+        MainMenu,
+        GameOptionsMenu,
+        AboutGameMenu,
+        ScreenResMenu,
+        BattleSimMenu,
+        Battle,
+    }
+    private GameState gameState = GameState.MainMenu;
 
     public static GameManager GM = null;
     // Use this for initialization
     void Awake()
     {
-        if (GM == null) GM = this;
-        else Destroy(gameObject);
+        if(GM == null)
+        {
+            GM = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
 
         DontDestroyOnLoad(gameObject);
-
-
-
-
 
     }
 
@@ -33,19 +48,54 @@ public class GameManager : MonoBehaviour
 
     // Update is called once per frame
     void Update () {
+        switch(gameState)
+        {
+            case GameState.FadeOut:
+                {
 
-        if (Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
-        if (Input.GetKeyDown(KeyCode.B)) BattleManager.instance.StartNewBattle(DataManager.DM.playerSquads[0], DataManager.DM.enemySquads[0]);
+                   
+                    break;
+                }
+            case GameState.FadeIn:
+                {
+
+                    break;
+                }
+            default:
+                break;
+        
+
+            
+        }
+        if(Input.GetKeyDown(KeyCode.Escape)) Application.Quit();
         if(Input.GetKeyDown(KeyCode.S))
             DataManager.DM.Save();
         if(Input.GetKeyDown(KeyCode.L))
             DataManager.DM.Load();
-        if(Input.GetKeyDown(KeyCode.R))
-        {
-            
-            BattleManager.instance.StartNewBattle(DataManager.DM.playerSquads[0], DataManager.DM.enemySquads[0]);
-        }
     }
+
+
+   private void InitializeState (GameState _gameState)
+    {
+        Debug.Log("initstate to " + _gameState.ToString());
+        //set camera view. This function called after fade out but before the fade in
+        switch(_gameState)
+        {
+            case GameState.Battle:
+                {
+                    BattleManager.instance.StartNewBattle(DataManager.DM.playerSquads[0], DataManager.DM.enemySquads[0]);
+                    break;
+                }
+            case GameState.MainMenu:
+                {
+                    break;
+                }
+            default:
+                break;
+        }
+        return;
+    }
+
 
     public void RollAllCharacters(int level)
     {
@@ -163,6 +213,22 @@ public class GameManager : MonoBehaviour
     public float RollZeroToUnderOne()
     {
         return Random.Range(0, GameSettings.randomNumberResolution) / ((float)GameSettings.randomNumberResolution);
+    }
+
+
+    public void NewGame()
+    {
+        InitializeState(GameState.Battle);
+    }
+    public void ContinueGame()
+    {
+        
+    }
+
+    public void QuitGame()
+    {
+        DataManager.DM.Save();
+        Application.Quit();
     }
 
 }

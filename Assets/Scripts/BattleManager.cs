@@ -48,13 +48,20 @@ public class BattleManager : MonoBehaviour {
     void Awake()
     {
         //make BM a singleton
-        if(instance == null) instance = this;
-        else Destroy(gameObject);
+        if(instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
+
         DontDestroyOnLoad(gameObject);
 
-        playerBattleGroup = new GameObject();
-        enemyBattleGroup = new GameObject();
 
+        
     }
 
     void Start()
@@ -64,6 +71,7 @@ public class BattleManager : MonoBehaviour {
 
     public void StartNewBattle(Squad _playerSquad, Squad _enemySquad)
     {
+        
         playerSquad = _playerSquad;
         enemySquad = _enemySquad;
 
@@ -71,6 +79,8 @@ public class BattleManager : MonoBehaviour {
 
         SoundManager.SM.PlaySfx(battleStart);
 
+        playerBattleGroup = new GameObject();
+        enemyBattleGroup = new GameObject();
         CreateBattleGroup(playerSquad, playerBattleGroup);
         CreateBattleGroup(enemySquad, enemyBattleGroup);
 

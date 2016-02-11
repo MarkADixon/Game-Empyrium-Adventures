@@ -10,6 +10,9 @@ public static class GameSettings
 
     public static int randomNumberResolution = 10000; //random is (0 to this-1)/this for a floating point 0 to less than 1 
 
+    public static float fadeTime = 0.5f; //for fade in and fade out effects, a scene change contains a fade out and fade in, so transition is 2x this time.
+    public static float volume = 1f;
+
     //level up
     public static int statPointsOnLevelUp = 10;
     public static int hitPointsMinOnLevelUp = 4;
